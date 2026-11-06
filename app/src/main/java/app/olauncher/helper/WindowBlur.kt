@@ -34,13 +34,13 @@ class WindowBlur(private val window: Window) {
 
     /** Call after the window is shown so its theme attributes have been resolved. */
     fun fadeIn() {
-        if (!supported) return
+        if (!supported || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
         start()
     }
 
     /** Fades the window and its blur out together, then runs [onEnd]. */
     fun fadeOut(onEnd: () -> Unit) {
-        if (!supported) {
+        if (!supported || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             onEnd()
             return
         }
@@ -81,13 +81,13 @@ class WindowBlur(private val window: Window) {
         animator = ValueAnimator.ofFloat(fraction, target).apply {
             duration = (this@WindowBlur.duration * abs(target - fraction)).toLong()
             interpolator = this@WindowBlur.interpolator
-            addUpdateListener { apply(it.animatedValue as Float) }
+            addUpdateListener { applyBlur(it.animatedValue as Float) }
             start()
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    private fun apply(fraction: Float) {
+    private fun applyBlur(fraction: Float) {
         this.fraction = fraction
         window.attributes = window.attributes.apply { blurBehindRadius = (radius * fraction).toInt() }
         window.setDimAmount(DIM_WITH_BLUR * fraction)

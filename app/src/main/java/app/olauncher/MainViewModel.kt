@@ -8,6 +8,7 @@ import android.content.pm.LauncherApps
 import android.os.Build
 import android.os.UserHandle
 import android.os.UserManager
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -74,7 +75,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         when (flag) {
             Constants.FLAG_LAUNCH_APP -> {
                 when (appModel) {
-                    is AppModel.PinnedShortcut -> launchShortcut(appModel)
+                    is AppModel.PinnedShortcut ->
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) launchShortcut(appModel)
                     is AppModel.App ->
                         launchApp(appModel.appPackage, appModel.activityClassName, appModel.user)
 
@@ -105,6 +107,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun launchShortcut(appModel: AppModel.PinnedShortcut) {
         val launcher = appContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
         val query = LauncherApps.ShortcutQuery().apply {

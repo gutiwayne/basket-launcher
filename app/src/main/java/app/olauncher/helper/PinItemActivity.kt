@@ -1,7 +1,9 @@
 package app.olauncher.helper
 
 import android.content.pm.LauncherApps
+import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import app.olauncher.R
 
@@ -9,6 +11,11 @@ class PinItemActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Pin requests only exist since Android 8.0; the system never starts this activity earlier.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            finish()
+            return
+        }
         
         window.setBackgroundDrawable(null)
 
@@ -23,6 +30,7 @@ class PinItemActivity : AppCompatActivity() {
         finish()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleRequestType(pinItemRequest: LauncherApps.PinItemRequest) {
         when (pinItemRequest.requestType) {
             LauncherApps.PinItemRequest.REQUEST_TYPE_SHORTCUT ->
@@ -35,6 +43,7 @@ class PinItemActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun handleShortcutRequest(pinItemRequest: LauncherApps.PinItemRequest) {
         val shortcutInfo = pinItemRequest.shortcutInfo
         if (shortcutInfo != null) {
