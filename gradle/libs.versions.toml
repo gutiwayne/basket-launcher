@@ -1,6 +1,6 @@
 [versions]
 appcompat = "1.8.0"
-coreKtx = "1.19.1"
+coreKtx = "1.18.0"
 gradle = "8.13.2"
 kotlinStdlib = "2.4.21"
 lifecycleViewmodelKtx = "2.11.0"
