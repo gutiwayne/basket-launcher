@@ -42,20 +42,19 @@ shot 2-all-apps
 swipe_to_previous        # All apps -> last list (Tools)
 shot 3-list
 
-read -r X Y < <(find_ui id search_src_text)
-adb shell input tap "$X" "$Y"
-sleep 1
-adb shell input text ca
+adb shell input text ca   # the search box already has focus (keyboard auto-shows)
 shot 4-search-in-list
 
-# Fresh drawer on All apps, long press an app that is in a list, open "Lists".
+# Fresh drawer on All apps, long press an app near the top that is in a list, open "Lists".
 adb shell input keyevent KEYCODE_HOME
 sleep 2
 adb shell input keyevent KEYCODE_HOME
 sleep 1
 swipe_up
 sleep 2
-read -r X Y < <(find_ui text Settings)
+adb shell input keyevent KEYCODE_BACK   # hide the keyboard so the whole list is reachable
+sleep 1
+read -r X Y < <(find_ui text Camera || find_ui text Calculator)
 adb shell input swipe "$X" "$Y" "$X" "$Y" 900
 sleep 1
 read -r X Y < <(find_ui text Lists)

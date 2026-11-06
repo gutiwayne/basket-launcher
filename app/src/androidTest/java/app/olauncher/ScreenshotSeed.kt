@@ -1,8 +1,14 @@
 package app.olauncher
 
+import android.app.WallpaperManager
 import android.content.Context
 import android.content.pm.LauncherActivityInfo
 import android.content.pm.LauncherApps
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Shader
 import android.os.Process
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -23,6 +29,19 @@ import org.junit.runner.RunWith
 class ScreenshotSeed {
 
     private val context: Context get() = InstrumentationRegistry.getInstrumentation().targetContext
+
+    /** Deep blue vertical gradient generated on the device: no third-party image, no personal photo. */
+    private fun setGradientWallpaper() {
+        val metrics = context.resources.displayMetrics
+        val bitmap = Bitmap.createBitmap(metrics.widthPixels, metrics.heightPixels, Bitmap.Config.ARGB_8888)
+        Canvas(bitmap).drawPaint(Paint().apply {
+            shader = LinearGradient(
+                0f, 0f, metrics.widthPixels * 0.3f, metrics.heightPixels.toFloat(),
+                intArrayOf(0xFF0B2A8C.toInt(), 0xFF06186A.toInt(), 0xFF020A2E.toInt()), null, Shader.TileMode.CLAMP,
+            )
+        })
+        WallpaperManager.getInstance(context).setBitmap(bitmap)
+    }
 
     @Test
     fun seed() {
@@ -52,29 +71,18 @@ class ScreenshotSeed {
         }
 
         val prefs = Prefs(context)
-        val home = (daily + tools).take(4)
-        prefs.homeAppsNum = home.size
-        home.forEachIndexed { i, info ->
-            val slot = i + 1
-            val name = info.label.toString()
-            val pkg = info.applicationInfo.packageName
-            val activity = info.componentName.className
-            when (slot) {
-                1 -> { prefs.appName1 = name; prefs.appPackage1 = pkg; prefs.appActivityClassName1 = activity; prefs.appUser1 = user.toString() }
-                2 -> { prefs.appName2 = name; prefs.appPackage2 = pkg; prefs.appActivityClassName2 = activity; prefs.appUser2 = user.toString() }
-                3 -> { prefs.appName3 = name; prefs.appPackage3 = pkg; prefs.appActivityClassName3 = activity; prefs.appUser3 = user.toString() }
-                4 -> { prefs.appName4 = name; prefs.appPackage4 = pkg; prefs.appActivityClassName4 = activity; prefs.appUser4 = user.toString() }
-            }
-        }
-        // Clean first run: no launcher chooser, tips, prompts or keyboard covering the drawer.
+        // Minimal home like a typical setup: only clock and date, apps live in the drawer and lists.
+        prefs.homeAppsNum = 0
+        setGradientWallpaper()
+
+        // Clean first run: no launcher chooser, tips or prompts. The keyboard stays on, as in daily use.
         prefs.firstOpen = false
         prefs.firstSettingsOpen = false
         prefs.hideSetDefaultLauncher = true
-        prefs.autoShowKeyboard = false
         prefs.wallpaperMsgShown = true
         prefs.firstOpenTime = System.currentTimeMillis()
         prefs.userState = Constants.UserState.SHARE
 
-        println("CESTA_SEED daily=${daily.map { it.label }} tools=${tools.map { it.label }} home=${home.map { it.label }}")
+        println("CESTA_SEED daily=${daily.map { it.label }} tools=${tools.map { it.label }}")
     }
 }
