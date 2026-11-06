@@ -78,4 +78,8 @@ android {
         applicationId "io.github.jesusg703.cesta"
         versionNameSuffix "-cesta"
     }
+    lint {
+        // Errores que ya trae el original; el CI solo falla por errores nuevos.
+        baseline = file("lint-baseline.xml")
+    }
 }
