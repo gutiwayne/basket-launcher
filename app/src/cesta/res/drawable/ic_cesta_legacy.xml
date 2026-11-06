@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icon for Android 7.x (no adaptive icons): rounded dark square with the basket. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/ic_launcher_background" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item android:drawable="@drawable/ic_cesta_foreground" />
+</layer-list>

@@ -98,6 +98,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
 
         if (showPentastic)
             binding.footer.text = getText(R.string.new_app_minimal_todo_lists)
+        binding.hideUpstreamPromos() // Cesta
     }
 
     override fun onClick(view: View) {

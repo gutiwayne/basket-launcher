@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import app.olauncher.data.Constants
+import app.olauncher.data.Fork
 import app.olauncher.data.Prefs
 import app.olauncher.databinding.ActivityMainBinding
 import app.olauncher.helper.getColorFromAttr
@@ -210,6 +211,7 @@ class MainActivity : AppCompatActivity() {
             checkForMessages()
         }
         viewModel.showDialog.observe(this) {
+            if (it in Fork.DISABLED_DIALOGS) return@observe // Cesta: no review/rate/share/Pro prompts
             when (it) {
                 Constants.Dialog.ABOUT -> {
                     showMessage(R.string.app_name, R.string.welcome_to_olauncher_settings, R.string.okay) {}

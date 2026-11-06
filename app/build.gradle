@@ -77,6 +77,14 @@ android {
     defaultConfig {
         applicationId "io.github.jesusg703.cesta"
         versionNameSuffix "-cesta"
+        // English only: drop upstream translations.
+        resourceConfigurations.clear()
+        resourceConfigurations += ["en"]
+    }
+    // Fork resources (name, icon, strings) layered over src/main without editing upstream files.
+    sourceSets {
+        debug.res.srcDirs += "src/cesta/res"
+        release.res.srcDirs += "src/cesta/res"
     }
     lint {
         // Issues already present upstream; CI fails only on new ones.
