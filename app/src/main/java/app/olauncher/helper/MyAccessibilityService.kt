@@ -4,7 +4,6 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.os.Build
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityNodeInfo
 import app.olauncher.R
 import app.olauncher.data.Prefs
 
@@ -21,10 +20,11 @@ class MyAccessibilityService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         try {
-            val source: AccessibilityNodeInfo = event.source ?: return
-            if (source.className != "android.widget.FrameLayout") return
+            // The click event already carries the clicked view's class and content description,
+            // so the service does not need to read window content (canRetrieveWindowContent=false).
+            if (event.className != "android.widget.FrameLayout") return
 
-            when (source.contentDescription) {
+            when (event.contentDescription) {
                 getString(R.string.lock_layout_description) -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
                         performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN)
