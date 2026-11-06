@@ -70,3 +70,12 @@ dependencies {
 
     testImplementation libs.junit
 }
+
+// --- Cesta Launcher (fork de Olauncher, de tanujnotes) ---
+// Cambios propios en un bloque aparte para que los merges del original no choquen.
+android {
+    defaultConfig {
+        applicationId "io.github.jesusg703.cesta"
+        versionNameSuffix "-cesta"
+    }
+}
