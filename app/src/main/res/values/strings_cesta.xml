@@ -13,7 +13,9 @@
     <string name="cesta_folder_name">Folder name</string>
     <string name="cesta_folder_default_name">Folder</string>
     <string name="cesta_folder_empty">Empty folder. Long press to add apps.</string>
-    <string name="cesta_shortcuts_not_supported">Shortcuts can\'t be added to folders yet</string>
+    <string name="cesta_reorder_apps">Reorder apps</string>
+    <string name="cesta_reorder_title">Tap an app to move it up</string>
+    <string name="cesta_sort_apps">Sort A–Z</string>
     <string name="cesta_added_to_folder">Added to %1$s</string>
     <string name="cesta_folder_suffix" translatable="false"> ›</string>
     <string name="cesta_add">Add</string>

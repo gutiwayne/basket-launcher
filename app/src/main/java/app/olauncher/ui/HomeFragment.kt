@@ -76,7 +76,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         folderUi = FolderUi(
             fragment = this,
             prefs = prefs,
-            launchApp = { launchApp(it.label, it.appPackage, it.activityClassName, it.user) },
+            launchApp = {
+                if (it.shortcutId != null) launchShortcut(it.shortcutId, it.appPackage, it.label, it.user)
+                else launchApp(it.label, it.appPackage, it.activityClassName, it.user)
+            },
             chooseApp = { slot -> showAppList(slot, prefs.getAppName(slot).isNotEmpty(), true) },
             addToFolder = { slot -> showAppList(FolderFlags.ADD_TO_FOLDER_BASE + slot, includeHiddenApps = true) },
             refresh = { populateHomeScreen(false) },

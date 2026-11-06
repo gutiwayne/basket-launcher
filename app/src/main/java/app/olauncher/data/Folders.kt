@@ -15,9 +15,14 @@ data class FolderApp(
     val appPackage: String,
     val activityClassName: String?,
     val user: String,
+    /** Set for pinned shortcuts (API 25+); null for regular apps. */
+    val shortcutId: String? = null,
 ) {
+    val isShortcut get() = shortcutId != null
+
     fun sameAppAs(other: FolderApp) =
-        appPackage == other.appPackage && user == other.user && activityClassName == other.activityClassName
+        appPackage == other.appPackage && user == other.user &&
+            activityClassName == other.activityClassName && shortcutId == other.shortcutId
 }
 
 data class Folder(
@@ -47,6 +52,7 @@ object FolderCodec {
                     put("package", app.appPackage)
                     put("activity", app.activityClassName ?: JSONObject.NULL)
                     put("user", app.user)
+                    put("shortcut", app.shortcutId ?: JSONObject.NULL)
                 })
             }
             array.put(JSONObject().apply {
@@ -75,6 +81,7 @@ object FolderCodec {
                     appPackage = a.getString("package"),
                     activityClassName = if (a.isNull("activity")) null else a.optString("activity"),
                     user = a.optString("user"),
+                    shortcutId = if (a.isNull("shortcut")) null else a.optString("shortcut"),
                 )
             }
             result += Folder(f.getString("id"), f.getInt("slot"), f.optString("name"), apps)
@@ -94,7 +101,18 @@ object FolderCodec {
 
     fun addApp(folders: List<Folder>, slot: Int, app: FolderApp) = folders.map { folder ->
         if (folder.slot != slot || folder.apps.any { it.sameAppAs(app) }) folder
-        else folder.copy(apps = (folder.apps + app).sortedBy { it.label.lowercase() })
+        else folder.copy(apps = folder.apps + app)
+    }
+
+    /** Moves [app] one position up (towards the top of the folder). */
+    fun moveUp(folders: List<Folder>, slot: Int, app: FolderApp) = folders.map { folder ->
+        val i = folder.apps.indexOfFirst { it.sameAppAs(app) }
+        if (folder.slot != slot || i <= 0) folder
+        else folder.copy(apps = folder.apps.toMutableList().apply { add(i - 1, removeAt(i)) })
+    }
+
+    fun sortByName(folders: List<Folder>, slot: Int) = folders.map { folder ->
+        if (folder.slot != slot) folder else folder.copy(apps = folder.apps.sortedBy { it.label.lowercase() })
     }
 
     fun removeApp(folders: List<Folder>, slot: Int, app: FolderApp) = folders.map { folder ->

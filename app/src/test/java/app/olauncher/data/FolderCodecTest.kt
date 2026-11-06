@@ -24,7 +24,46 @@ class FolderCodecTest {
         assertEquals(folders, decoded)
         assertEquals("Viajes", decoded[0].name)
         assertNull(decoded[0].apps.first { it.appPackage == "com.bank" }.activityClassName)
-        assertEquals(listOf("Banco", "Gmail", "Maps"), decoded[0].apps.map { it.label })
+        assertEquals(listOf("Maps", "Banco", "Gmail"), decoded[0].apps.map { it.label }) // insertion order
+    }
+
+    @Test
+    fun shortcutsRoundTripAndDifferFromTheirApp() {
+        val shortcut = maps.copy(label = "Home", activityClassName = null, shortcutId = "nav-home")
+        var folders = FolderCodec.create(emptyList(), 1, "A", maps, id = "a")
+        folders = FolderCodec.addApp(folders, 1, shortcut)
+        assertEquals(2, folders[0].apps.size)
+
+        val decoded = FolderCodec.decode(FolderCodec.encode(folders))
+        assertEquals(folders, decoded)
+        assertTrue(decoded[0].apps[1].isShortcut)
+        assertNull(decoded[0].apps[0].shortcutId)
+    }
+
+    @Test
+    fun oldJsonWithoutShortcutFieldStillLoads() {
+        val json = "{\"v\":1,\"folders\":[{\"id\":\"a\",\"slot\":2,\"name\":\"X\",\"apps\":" +
+            "[{\"label\":\"Maps\",\"package\":\"p\",\"activity\":null,\"user\":\"u\"}]}]}"
+        val app = FolderCodec.decode(json)[0].apps[0]
+        assertNull(app.shortcutId)
+        assertEquals("p", app.appPackage)
+    }
+
+    @Test
+    fun moveUpAndSort() {
+        var folders = FolderCodec.create(emptyList(), 1, "A", maps, id = "a")
+        folders = FolderCodec.addApp(folders, 1, bank)
+        folders = FolderCodec.addApp(folders, 1, workMail)
+        assertEquals(listOf("Maps", "Banco", "Gmail"), folders[0].apps.map { it.label })
+
+        folders = FolderCodec.moveUp(folders, 1, workMail)
+        assertEquals(listOf("Maps", "Gmail", "Banco"), folders[0].apps.map { it.label })
+
+        folders = FolderCodec.moveUp(folders, 1, maps) // already first: no change
+        assertEquals(listOf("Maps", "Gmail", "Banco"), folders[0].apps.map { it.label })
+
+        folders = FolderCodec.sortByName(folders, 1)
+        assertEquals(listOf("Banco", "Gmail", "Maps"), folders[0].apps.map { it.label })
     }
 
     @Test

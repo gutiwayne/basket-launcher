@@ -1,6 +1,8 @@
 package app.olauncher.ui
 
 import android.content.Context
+import android.content.pm.LauncherApps
+import android.os.Build
 import android.text.InputType
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -21,6 +23,7 @@ import app.olauncher.databinding.DialogBaseBinding
 import app.olauncher.helper.OlDialog
 import app.olauncher.helper.createDialog
 import app.olauncher.helper.dpToPx
+import app.olauncher.helper.getUserHandleFromString
 import app.olauncher.helper.isAppCheckReliable
 import app.olauncher.helper.isPackageInstalled
 import app.olauncher.helper.showToast
@@ -75,6 +78,12 @@ class FolderUi(
             }
         } else {
             options += R.string.cesta_add_app to { addToFolder(slot) }
+            if (folder.apps.size > 1) {
+                options += R.string.cesta_reorder_apps to { showReorderDialog(slot) }
+                options += R.string.cesta_sort_apps to {
+                    store.update { list -> FolderCodec.sortByName(list, slot) }
+                }
+            }
             if (folder.apps.isNotEmpty()) options += R.string.cesta_remove_app to {
                 showAppsDialog(context.getString(R.string.cesta_remove_app), folder.apps) { app ->
                     store.update { list -> FolderCodec.removeApp(list, slot, app) }
@@ -103,22 +112,51 @@ class FolderUi(
         showListDialog(title, options.map { context.getString(it.first) }) { options[it].second() }
     }
 
+    /** Each tap moves the app one position up and reopens the list, so several moves are quick. */
+    private fun showReorderDialog(slot: Int) {
+        val folder = store.folderAt(slot) ?: return
+        showAppsDialog(context.getString(R.string.cesta_reorder_title), folder.apps) { app ->
+            store.update { list -> FolderCodec.moveUp(list, slot, app) }
+            showReorderDialog(slot)
+        }
+    }
+
     /** The app already in the slot becomes the first app of the new folder. */
     private fun appInSlot(slot: Int): FolderApp? {
         val name = prefs.getAppName(slot)
         val pkg = prefs.getAppPackage(slot)
-        if (name.isEmpty() || pkg.isEmpty() || prefs.getIsShortcut(slot)) return null
+        if (name.isEmpty() || pkg.isEmpty()) return null
+        if (prefs.getIsShortcut(slot)) {
+            val shortcutId = prefs.getShortcutId(slot).ifEmpty { return null }
+            return FolderApp(name, pkg, null, prefs.getAppUser(slot), shortcutId)
+        }
         return FolderApp(name, pkg, prefs.getAppActivityClassName(slot).ifEmpty { null }, prefs.getAppUser(slot))
     }
 
     /** Installed apps. Missing ones are only removed when Android confirms it (see isAppCheckReliable). */
     private fun visibleApps(folder: Folder): List<FolderApp> {
-        val (installed, missing) = folder.apps.partition { isPackageInstalled(context, it.appPackage, it.user) }
+        val (installed, missing) = folder.apps.partition {
+            if (it.isShortcut) isShortcutPinned(it) else isPackageInstalled(context, it.appPackage, it.user)
+        }
         val gone = missing.filter { isAppCheckReliable(context, it.user) }
         if (gone.isNotEmpty()) {
             store.update { list -> FolderCodec.removeApps(list) { app -> gone.any { it.sameAppAs(app) } } }
         }
         return installed
+    }
+
+    private fun isShortcutPinned(app: FolderApp): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) return false
+        return try {
+            val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
+            val query = LauncherApps.ShortcutQuery().apply {
+                setPackage(app.appPackage)
+                setQueryFlags(LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED)
+            }
+            launcherApps.getShortcuts(query, getUserHandleFromString(context, app.user))?.any { it.id == app.shortcutId } == true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     private fun primaryColor(): Int {

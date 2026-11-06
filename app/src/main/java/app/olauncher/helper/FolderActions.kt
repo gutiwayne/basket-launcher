@@ -10,14 +10,15 @@ import app.olauncher.data.FolderStore
 /** Cesta: add the app picked in the drawer to the folder in [slot]. Kept out of MainViewModel to ease upstream merges. */
 fun addAppToFolder(context: Context, appModel: AppModel, slot: Int) {
     when (appModel) {
-        is AppModel.App -> {
-            val store = FolderStore(context)
-            val app = FolderApp(appModel.appLabel, appModel.appPackage, appModel.activityClassName, appModel.user.toString())
-            store.update { FolderCodec.addApp(it, slot, app) }
-            store.folderAt(slot)?.let { context.showToast(context.getString(R.string.cesta_added_to_folder, it.name)) }
-        }
+        is AppModel.App -> add(context, slot, FolderApp(appModel.appLabel, appModel.appPackage, appModel.activityClassName, appModel.user.toString()))
 
-        is AppModel.PinnedShortcut -> context.showToast(context.getString(R.string.cesta_shortcuts_not_supported))
+        is AppModel.PinnedShortcut -> add(context, slot, FolderApp(appModel.appLabel, appModel.appPackage, null, appModel.user.toString(), appModel.shortcutId))
         else -> {}
     }
+}
+
+private fun add(context: Context, slot: Int, app: FolderApp) {
+    val store = FolderStore(context)
+    store.update { FolderCodec.addApp(it, slot, app) }
+    store.folderAt(slot)?.let { context.showToast(context.getString(R.string.cesta_added_to_folder, it.name)) }
 }
