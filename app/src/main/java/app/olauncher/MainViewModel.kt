@@ -19,13 +19,11 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import app.olauncher.data.AppModel
 import app.olauncher.data.Constants
-import app.olauncher.data.FolderApp
-import app.olauncher.data.FolderCodec
 import app.olauncher.data.FolderFlags
-import app.olauncher.data.FolderStore
 import app.olauncher.data.Prefs
 import app.olauncher.helper.SingleLiveEvent
 import app.olauncher.helper.WallpaperWorker
+import app.olauncher.helper.addAppToFolder
 import app.olauncher.helper.formattedTimeSpent
 import app.olauncher.helper.getAppsList
 import app.olauncher.helper.getPrivateSpaceApps
@@ -106,24 +104,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             Constants.FLAG_SET_CLOCK_APP -> saveClockApp(appModel)
             Constants.FLAG_SET_CALENDAR_APP -> saveCalendarApp(appModel)
             Constants.FLAG_SET_SCREEN_TIME_APP -> saveScreenTimeApp(appModel)
-            in FolderFlags.ADD_TO_FOLDER_RANGE -> addToFolder(appModel, flag - FolderFlags.ADD_TO_FOLDER_BASE)
-        }
-    }
-
-    // Cesta: add the app picked in the drawer to the folder in [slot]
-    private fun addToFolder(appModel: AppModel, slot: Int) {
-        when (appModel) {
-            is AppModel.App -> {
-                val store = FolderStore(appContext)
-                val app = FolderApp(appModel.appLabel, appModel.appPackage, appModel.activityClassName, appModel.user.toString())
-                store.update { FolderCodec.addApp(it, slot, app) }
-                store.folderAt(slot)?.let { appContext.showToast(appContext.getString(R.string.cesta_added_to_folder, it.name)) }
+            in FolderFlags.ADD_TO_FOLDER_RANGE -> { // Cesta
+                addAppToFolder(appContext, appModel, flag - FolderFlags.ADD_TO_FOLDER_BASE)
+                refreshHome.postValue(false)
             }
-
-            is AppModel.PinnedShortcut -> appContext.showToast(appContext.getString(R.string.cesta_shortcuts_not_supported))
-            else -> {}
         }
-        refreshHome.postValue(false)
     }
 
     private fun launchShortcut(appModel: AppModel.PinnedShortcut) {
