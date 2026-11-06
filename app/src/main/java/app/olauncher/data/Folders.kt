@@ -6,9 +6,9 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.UUID
 
-// Cesta Launcher: carpetas en la pantalla de inicio.
-// Cada carpeta ocupa uno de los huecos de inicio (1..8) y se guarda como JSON en las mismas
-// SharedPreferences del launcher, que viven en el almacenamiento de la app y sobreviven a reinicios.
+// Cesta Launcher: home screen folders.
+// Each folder takes one of the home slots (1..8) and is stored as JSON in the launcher's own
+// SharedPreferences, which live in app storage and survive reboots.
 
 data class FolderApp(
     val label: String,
@@ -28,12 +28,12 @@ data class Folder(
 )
 
 object FolderFlags {
-    /** Flag del cajón de apps para añadir a la carpeta del hueco n: BASE + n (41..48). */
+    /** App drawer flag for adding to the folder in slot n: BASE + n (41..48). */
     const val ADD_TO_FOLDER_BASE = 40
     val ADD_TO_FOLDER_RANGE = (ADD_TO_FOLDER_BASE + 1)..(ADD_TO_FOLDER_BASE + 8)
 }
 
-/** Conversión a/desde JSON y operaciones puras sobre la lista (sin Android: se prueban en tests JVM). */
+/** JSON conversion and pure list operations (no Android dependencies, covered by JVM tests). */
 object FolderCodec {
     private const val VERSION = 1
 
@@ -59,7 +59,7 @@ object FolderCodec {
         return JSONObject().put("v", VERSION).put("folders", array).toString()
     }
 
-    /** Lanza [JSONException] si el contenido está dañado, para no sobrescribirlo a ciegas. */
+    /** Throws [JSONException] on damaged content so it is never blindly overwritten. */
     fun decode(json: String?): List<Folder> {
         if (json.isNullOrBlank()) return emptyList()
         val root = JSONObject(json)
@@ -105,14 +105,14 @@ object FolderCodec {
         folders.map { folder -> folder.copy(apps = folder.apps.filterNot(shouldRemove)) }
 }
 
-/** Guarda las carpetas con commit() (escritura síncrona): ya están en disco antes de apagar el móvil. */
+/** Saves folders with commit() (synchronous write), so they are on disk before the phone shuts down. */
 class FolderStore(context: Context) {
     private val prefs = context.getSharedPreferences(PREFS_FILENAME, 0)
 
     fun all(): List<Folder> = try {
         FolderCodec.decode(prefs.getString(KEY, null))
     } catch (e: JSONException) {
-        // Contenido dañado: se aparta una copia para no perderlo y se empieza de cero.
+        // Damaged content: keep a copy aside instead of losing it, then start fresh.
         prefs.edit().putString(KEY_DAMAGED, prefs.getString(KEY, null)).remove(KEY).commit()
         emptyList()
     }

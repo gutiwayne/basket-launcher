@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cesta Launcher: textos de las carpetas -->
+<!-- Cesta Launcher: folder strings -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="cesta_choose_app">Choose app</string>
     <string name="cesta_create_folder">Create folder</string>

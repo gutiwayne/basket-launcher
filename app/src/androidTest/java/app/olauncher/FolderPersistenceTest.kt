@@ -11,9 +11,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Cesta: prueba de que las carpetas sobreviven a un reinicio del sistema.
- * El CI ejecuta writeFolders, reinicia el emulador (adb reboot) y luego verifyFoldersAfterReboot.
- * Ver .github/scripts/reboot-test.sh.
+ * Cesta: checks that folders survive a system reboot.
+ * CI runs writeFolders, reboots the emulator (adb reboot), then runs verifyFoldersAfterReboot.
+ * See .github/scripts/reboot-test.sh.
  */
 @RunWith(AndroidJUnit4::class)
 class FolderPersistenceTest {

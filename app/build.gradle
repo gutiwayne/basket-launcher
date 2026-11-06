@@ -71,18 +71,18 @@ dependencies {
     testImplementation libs.junit
 }
 
-// --- Cesta Launcher (fork de Olauncher, de tanujnotes) ---
-// Cambios propios en un bloque aparte para que los merges del original no choquen.
+// --- Cesta Launcher (fork of Olauncher by tanujnotes) ---
+// Fork-specific changes live in a separate block so upstream merges do not conflict.
 android {
     defaultConfig {
         applicationId "io.github.jesusg703.cesta"
         versionNameSuffix "-cesta"
     }
     lint {
-        // Errores que ya trae el original; el CI solo falla por errores nuevos.
+        // Issues already present upstream; CI fails only on new ones.
         baseline = file("lint-baseline.xml")
     }
-    // Firma de release: solo en CI (workflow release.yml), con la clave guardada como secreto.
+    // Release signing: CI only (release.yml), using the keystore stored as a secret.
     def cestaKeystore = System.getenv("CESTA_KEYSTORE")
     if (cestaKeystore) {
         signingConfigs {
@@ -99,9 +99,9 @@ android {
 }
 
 dependencies {
-    // Implementación real de org.json para los tests JVM de las carpetas (en android.jar es un stub).
+    // Real org.json implementation for the folder JVM tests (android.jar only ships a stub).
     testImplementation "org.json:json:20260814"
-    // Prueba de reinicio en emulador (CI)
+    // Emulator reboot test (CI)
     androidTestImplementation "androidx.test:runner:1.7.0"
     androidTestImplementation "androidx.test.ext:junit:1.3.0"
 }

@@ -333,7 +333,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         folderUi.applyToHome(::homeSlotView, prefs.homeAppsNum)
     }
 
-    // Cesta: huecos de inicio 1..8
+    // Cesta: home slots 1..8
     private fun homeSlotOf(view: View): Int? = when (view.id) {
         R.id.homeApp1 -> 1
         R.id.homeApp2 -> 2
@@ -485,8 +485,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         return false
     }
 
-    // Cesta: tras un reinicio, con el perfil de trabajo o el espacio privado bloqueados, Android puede no
-    // devolver todavía las apps. Antes se borraba el hueco para siempre; ahora solo si la comprobación es fiable.
+    // Cesta: right after a reboot, or with the work profile / private space locked, Android may not return
+    // the app yet. Upstream wiped the slot for good; now it is only cleared when the check is reliable.
     private fun onHomeAppMissing(textView: TextView, appName: String, userString: String, forget: () -> Unit) {
         if (isAppCheckReliable(requireContext(), userString)) forget()
         else textView.text = appName

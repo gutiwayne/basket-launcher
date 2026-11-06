@@ -110,7 +110,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // Cesta: añadir la app elegida en el cajón a la carpeta del hueco [slot]
+    // Cesta: add the app picked in the drawer to the folder in [slot]
     private fun addToFolder(appModel: AppModel, slot: Int) {
         when (appModel) {
             is AppModel.App -> {

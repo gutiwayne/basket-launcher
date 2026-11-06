@@ -1,7 +1,7 @@
-name: Sincronizar con Olauncher
+name: Sync with Olauncher
 
-# Cada lunes: master = copia exacta del original; se fusiona en carpetas, se prueba y se sube.
-# Si hay conflicto o fallan los tests, no se sube nada y se abre una issue (GitHub te avisa).
+# Every Monday: master = exact mirror of upstream; merged into carpetas, tested and pushed.
+# On conflict or test failure nothing is pushed and an issue is opened (GitHub notifies you).
 on:
   schedule:
     - cron: "17 6 * * 1"
@@ -24,7 +24,7 @@ jobs:
           ref: carpetas
           fetch-depth: 0
 
-      - name: Traer el original
+      - name: Fetch upstream
         id: fetch
         run: |
           git config user.name "github-actions[bot]"
@@ -34,18 +34,18 @@ jobs:
           git fetch --no-tags origin master
           echo "new=$(git rev-list --count origin/master..upstream/master)" >> "$GITHUB_OUTPUT"
 
-      - name: Actualizar master (solo avance rápido)
+      - name: Update master (fast-forward only)
         if: steps.fetch.outputs.new != '0'
         run: git push origin upstream/master:refs/heads/master
 
-      - name: Fusionar en carpetas
+      - name: Merge into carpetas
         id: merge
         if: steps.fetch.outputs.new != '0'
         run: |
           if git merge --no-edit upstream/master -m "Merge Olauncher upstream ($(git rev-parse --short upstream/master))"; then
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
-            git diff --name-only --diff-filter=U > conflictos.txt
+            git diff --name-only --diff-filter=U > conflicts.txt
             git merge --abort
             echo "ok=false" >> "$GITHUB_OUTPUT"
           fi
@@ -59,28 +59,28 @@ jobs:
       - uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
         if: steps.merge.outputs.ok == 'true'
 
-      - name: Probar la fusión
+      - name: Test the merge
         id: test
         if: steps.merge.outputs.ok == 'true'
         run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
 
-      - name: Subir carpetas
+      - name: Push carpetas
         if: steps.merge.outputs.ok == 'true' && steps.test.outcome == 'success'
         run: git push origin HEAD:carpetas
 
-      - name: Avisar si hay que intervenir
+      - name: Report when manual action is needed
         if: failure() || steps.merge.outputs.ok == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           {
-            echo "La sincronización semanal con Olauncher necesita revisión."
+            echo "The weekly sync with Olauncher needs attention."
             echo
-            echo "- Ejecución: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            if [ -s conflictos.txt ]; then echo "- Conflictos en:"; sed 's/^/  - `/; s/$/`/' conflictos.txt; else echo "- Motivo: fallan los tests o la compilación tras fusionar."; fi
+            echo "- Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            if [ -s conflicts.txt ]; then echo "- Conflicts in:"; sed 's/^/  - `/; s/$/`/' conflicts.txt; else echo "- Reason: build or tests fail after merging."; fi
             echo
-            echo "No se ha subido nada a \`carpetas\`. \`master\` ya está al día con el original."
+            echo "Nothing was pushed to \`carpetas\`. \`master\` is already up to date with upstream."
           } > issue.md
-          gh issue create --title "Sincronización con Olauncher: revisar ($(date +%F))" --body-file issue.md \
-            || echo "::warning::No se pudo abrir la issue (¿Issues desactivadas en el fork?). GitHub avisa igualmente del fallo por email."
+          gh issue create --title "Olauncher sync: needs review ($(date +%F))" --body-file issue.md \
+            || echo "::warning::Could not open an issue (Issues disabled on the fork?). GitHub still emails you about the failed run."
           exit 1

@@ -1,16 +1,16 @@
 name: Release
 
-# Publica una versión firmada al subir una etiqueta, p. ej.: git tag v6.11.5-cesta.1 && git push origin v6.11.5-cesta.1
+# Publishes a signed build when a tag is pushed, e.g.: git tag v6.11.5-cesta.1 && git push origin v6.11.5-cesta.1
 on:
   push:
-    tags: ["v*-cesta*"]   # las etiquetas del original (v6.11.5…) no publican nada
+    tags: ["v*-cesta*"]   # upstream tags (v6.11.5…) never publish anything
 
 permissions:
   contents: write
 
 jobs:
   release:
-    name: APK firmado y release
+    name: Signed APK and release
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -26,39 +26,39 @@ jobs:
       - name: Tests
         run: ./gradlew --no-daemon testDebugUnitTest lintDebug
 
-      - name: Compilar release firmado
+      - name: Build signed release
         env:
           KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
           CESTA_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: |
-          test -n "$KEYSTORE_BASE64" || { echo "::error::Falta el secreto SIGNING_KEYSTORE_BASE64"; exit 1; }
+          test -n "$KEYSTORE_BASE64" || { echo "::error::Missing secret SIGNING_KEYSTORE_BASE64"; exit 1; }
           export CESTA_KEYSTORE="$RUNNER_TEMP/cesta.p12"
           echo "$KEYSTORE_BASE64" | base64 -d > "$CESTA_KEYSTORE"
           ./gradlew --no-daemon assembleRelease
           rm -f "$CESTA_KEYSTORE"
 
-      - name: Verificar firma
+      - name: Verify signature
         id: apk
         run: |
           APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
           SRC=$(ls app/build/outputs/apk/release/*.apk | head -1)
           OUT="cesta-launcher-${GITHUB_REF_NAME}.apk"
           cp "$SRC" "$OUT"
-          "$APKSIGNER" verify --print-certs "$OUT" | tee firma.txt
-          grep -q "SHA-256 digest" firma.txt
+          "$APKSIGNER" verify --print-certs "$OUT" | tee signature.txt
+          grep -q "SHA-256 digest" signature.txt
           sha256sum "$OUT" > "$OUT.sha256"
           echo "file=$OUT" >> "$GITHUB_OUTPUT"
-          echo "cert=$(grep -m1 'SHA-256 digest' firma.txt | awk '{print $NF}')" >> "$GITHUB_OUTPUT"
+          echo "cert=$(grep -m1 'SHA-256 digest' signature.txt | awk '{print $NF}')" >> "$GITHUB_OUTPUT"
 
-      - name: Crear release
+      - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cat > notas.md <<NOTES
-          **Cesta Launcher**: fork de [Olauncher](https://github.com/tanujnotes/Olauncher) (de tanujnotes, GPL-3.0) con carpetas en la pantalla de inicio.
+          cat > notes.md <<NOTES
+          **Cesta Launcher**: a fork of [Olauncher](https://github.com/tanujnotes/Olauncher) by tanujnotes (GPL-3.0) with home screen folders.
 
-          - Huella SHA-256 del certificado de firma: \`${{ steps.apk.outputs.cert }}\`
-          - Comprueba el APK con \`${{ steps.apk.outputs.file }}.sha256\`.
+          - Signing certificate SHA-256 fingerprint: \`${{ steps.apk.outputs.cert }}\`
+          - Verify the APK with \`${{ steps.apk.outputs.file }}.sha256\`.
           NOTES
           gh release create "$GITHUB_REF_NAME" "${{ steps.apk.outputs.file }}" "${{ steps.apk.outputs.file }}.sha256" \
-            --title "Cesta Launcher $GITHUB_REF_NAME" --notes-file notas.md --generate-notes
+            --title "Cesta Launcher $GITHUB_REF_NAME" --notes-file notes.md --generate-notes

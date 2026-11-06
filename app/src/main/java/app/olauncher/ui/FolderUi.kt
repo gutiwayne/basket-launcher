@@ -28,9 +28,9 @@ import app.olauncher.helper.showPopupMenu
 import app.olauncher.helper.showToast
 
 /**
- * Cesta Launcher: carpetas en los huecos de la pantalla de inicio.
- * - Pulsación larga en un hueco: elegir app o crear carpeta; si es carpeta, añadir, quitar, renombrar o eliminar.
- * - Pulsación en una carpeta: lista de sus apps con el mismo estilo de texto que la pantalla de inicio.
+ * Cesta Launcher: folders in the home screen slots.
+ * - Long press a slot: choose app or create folder; on a folder: add, remove, rename or delete.
+ * - Tap a folder: list of its apps, using the same text style as the home screen.
  */
 class FolderUi(
     private val fragment: Fragment,
@@ -43,7 +43,7 @@ class FolderUi(
     private val context: Context get() = fragment.requireContext()
     private val store: FolderStore get() = FolderStore(context)
 
-    /** Pinta el nombre de cada carpeta en su hueco. Llamar después de pintar las apps. */
+    /** Draws each folder name in its slot. Call after the home apps are drawn. */
     fun applyToHome(slotView: (Int) -> TextView, homeAppsNum: Int) {
         store.all().filter { it.slot in 1..homeAppsNum }.forEach { folder ->
             slotView(folder.slot).apply {
@@ -53,7 +53,7 @@ class FolderUi(
         }
     }
 
-    /** Si el hueco es una carpeta la abre y devuelve true. */
+    /** Opens the folder if the slot holds one and returns true. */
     fun openIfFolder(slot: Int): Boolean {
         val folder = store.folderAt(slot) ?: return false
         val apps = visibleApps(folder)
@@ -111,7 +111,7 @@ class FolderUi(
         }
     }
 
-    /** La app que ya había en el hueco pasa a ser la primera de la carpeta nueva. */
+    /** The app already in the slot becomes the first app of the new folder. */
     private fun appInSlot(slot: Int): FolderApp? {
         val name = prefs.getAppName(slot)
         val pkg = prefs.getAppPackage(slot)
@@ -119,7 +119,7 @@ class FolderUi(
         return FolderApp(name, pkg, prefs.getAppActivityClassName(slot).ifEmpty { null }, prefs.getAppUser(slot))
     }
 
-    /** Apps instaladas. Las que faltan solo se borran si Android lo confirma (ver isAppCheckReliable). */
+    /** Installed apps. Missing ones are only removed when Android confirms it (see isAppCheckReliable). */
     private fun visibleApps(folder: Folder): List<FolderApp> {
         val (installed, missing) = folder.apps.partition { isPackageInstalled(context, it.appPackage, it.user) }
         val gone = missing.filter { isAppCheckReliable(context, it.user) }

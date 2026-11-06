@@ -211,9 +211,9 @@ fun isPackageInstalled(context: Context, packageName: String, userString: String
 }
 
 /**
- * Cesta: indica si «la app no aparece» significa de verdad que se ha desinstalado.
- * Falso si el perfil de ese usuario no está disponible, no está desbloqueado (justo tras arrancar)
- * o está en modo silencioso (perfil de trabajo pausado, espacio privado bloqueado).
+ * Cesta: whether "app not found" really means the app was uninstalled.
+ * False if that user's profile is unavailable, still locked (right after boot)
+ * or in quiet mode (paused work profile, locked private space).
  */
 fun isAppCheckReliable(context: Context, userString: String): Boolean {
     return try {
