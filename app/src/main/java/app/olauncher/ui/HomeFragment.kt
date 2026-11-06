@@ -28,6 +28,7 @@ import app.olauncher.MainViewModel
 import app.olauncher.R
 import app.olauncher.data.AppModel
 import app.olauncher.data.Constants
+import app.olauncher.data.FolderFlags
 import app.olauncher.data.Prefs
 import app.olauncher.databinding.FragmentHomeBinding
 import app.olauncher.helper.appUsagePermissionGranted
@@ -54,6 +55,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private lateinit var prefs: Prefs
     private lateinit var viewModel: MainViewModel
     private lateinit var deviceManager: DevicePolicyManager
+    private lateinit var folderUi: FolderUi
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -71,6 +73,14 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         } ?: throw Exception("Invalid Activity")
 
         deviceManager = context?.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        folderUi = FolderUi(
+            fragment = this,
+            prefs = prefs,
+            launchApp = { launchApp(it.label, it.appPackage, it.activityClassName, it.user) },
+            chooseApp = { slot -> showAppList(slot, prefs.getAppName(slot).isNotEmpty(), true) },
+            addToFolder = { slot -> showAppList(FolderFlags.ADD_TO_FOLDER_BASE + slot, includeHiddenApps = true) },
+            refresh = { populateHomeScreen(false) },
+        )
 
         initObservers()
         setHomeAlignment(prefs.homeAlignment)
@@ -132,6 +142,10 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     override fun onLongClick(view: View): Boolean {
+        homeSlotOf(view)?.let { slot ->
+            folderUi.showSlotMenu(view, slot)
+            return true
+        }
         when (view.id) {
             R.id.homeApp1 -> showAppList(Constants.FLAG_SET_HOME_APP_1, prefs.appName1.isNotEmpty(), true)
             R.id.homeApp2 -> showAppList(Constants.FLAG_SET_HOME_APP_2, prefs.appName2.isNotEmpty(), true)
@@ -315,6 +329,35 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun populateHomeScreen(appCountUpdated: Boolean) {
+        populateHomeApps(appCountUpdated)
+        folderUi.applyToHome(::homeSlotView, prefs.homeAppsNum)
+    }
+
+    // Cesta: huecos de inicio 1..8
+    private fun homeSlotOf(view: View): Int? = when (view.id) {
+        R.id.homeApp1 -> 1
+        R.id.homeApp2 -> 2
+        R.id.homeApp3 -> 3
+        R.id.homeApp4 -> 4
+        R.id.homeApp5 -> 5
+        R.id.homeApp6 -> 6
+        R.id.homeApp7 -> 7
+        R.id.homeApp8 -> 8
+        else -> null
+    }
+
+    private fun homeSlotView(slot: Int): TextView = when (slot) {
+        1 -> binding.homeApp1
+        2 -> binding.homeApp2
+        3 -> binding.homeApp3
+        4 -> binding.homeApp4
+        5 -> binding.homeApp5
+        6 -> binding.homeApp6
+        7 -> binding.homeApp7
+        else -> binding.homeApp8
+    }
+
+    private fun populateHomeApps(appCountUpdated: Boolean) {
         if (appCountUpdated) hideHomeApps()
         populateDateTime()
 
@@ -521,6 +564,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun homeAppClicked(location: Int) {
+        if (folderUi.openIfFolder(location)) return
         launchAppOrShortcut(
             appName = prefs.getAppName(location),
             packageName = prefs.getAppPackage(location),

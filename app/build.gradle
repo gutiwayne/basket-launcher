@@ -83,3 +83,8 @@ android {
         baseline = file("lint-baseline.xml")
     }
 }
+
+dependencies {
+    // Implementación real de org.json para los tests JVM de las carpetas (en android.jar es un stub).
+    testImplementation "org.json:json:20260814"
+}
