@@ -28,7 +28,13 @@ echo "$seed" | grep -q "^OK (1 test)" || { echo "$seed"; exit 1; }
 
 # Make Cesta the home app, hide the navigation hint bar noise, go home.
 HOME_ACTIVITY=$(adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME "$PKG" | tr -d '\r' | tail -1)
-adb shell cmd package set-home-activity "$HOME_ACTIVITY"
+for attempt in 1 2 3 4 5; do
+  adb shell cmd role add-role-holder android.app.role.HOME "$PKG" 0 2>/dev/null \
+    || adb shell cmd package set-home-activity "$HOME_ACTIVITY" 2>/dev/null || true
+  adb shell cmd role get-role-holders android.app.role.HOME | tr -d '\r' | grep -q "$PKG" && break
+  echo "home role not set yet (attempt $attempt)"; sleep 3
+done
+adb shell cmd role get-role-holders android.app.role.HOME | tr -d '\r' | grep -q "$PKG" || { echo "::error::could not make Cesta the home app"; exit 1; }
 adb shell settings put global policy_control immersive.navigation=* || true
 adb shell input keyevent KEYCODE_HOME
 sleep 3
