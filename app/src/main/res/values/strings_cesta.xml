@@ -16,4 +16,6 @@
     <string name="cesta_shortcuts_not_supported">Shortcuts can\'t be added to folders yet</string>
     <string name="cesta_added_to_folder">Added to %1$s</string>
     <string name="cesta_folder_suffix" translatable="false"> ›</string>
+    <string name="cesta_add">Add</string>
+    <string name="cesta_slot_hint">Add app or folder</string>
 </resources>

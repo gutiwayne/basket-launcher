@@ -4,7 +4,6 @@ import android.content.Context
 import android.text.InputType
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -24,7 +23,6 @@ import app.olauncher.helper.createDialog
 import app.olauncher.helper.dpToPx
 import app.olauncher.helper.isAppCheckReliable
 import app.olauncher.helper.isPackageInstalled
-import app.olauncher.helper.showPopupMenu
 import app.olauncher.helper.showToast
 
 /**
@@ -62,43 +60,35 @@ class FolderUi(
         return true
     }
 
-    fun showSlotMenu(anchor: View, slot: Int) {
+    /** Centered dialog with the slot actions (a popup anchored to the slot got cut off at the screen edge). */
+    fun showSlotMenu(slot: Int) {
         val folder = store.folderAt(slot)
-        anchor.showPopupMenu(configure = { menu ->
-            if (folder == null) {
-                menu.add(0, MENU_CHOOSE_APP, 0, R.string.cesta_choose_app)
-                menu.add(0, MENU_CREATE, 1, R.string.cesta_create_folder)
-            } else {
-                menu.add(0, MENU_ADD, 0, R.string.cesta_add_app)
-                if (folder.apps.isNotEmpty()) menu.add(0, MENU_REMOVE, 1, R.string.cesta_remove_app)
-                menu.add(0, MENU_RENAME, 2, R.string.cesta_rename_folder)
-                menu.add(0, MENU_DELETE, 3, R.string.cesta_delete_folder)
-            }
-        }) { item ->
-            when (item.itemId) {
-                MENU_CHOOSE_APP -> chooseApp(slot)
-                MENU_CREATE -> askName(context.getString(R.string.cesta_folder_default_name)) { name ->
+        val options = mutableListOf<Pair<Int, () -> Unit>>()
+        if (folder == null) {
+            options += R.string.cesta_choose_app to { chooseApp(slot) }
+            options += R.string.cesta_create_folder to {
+                askName(context.getString(R.string.cesta_folder_default_name)) { name ->
                     store.update { FolderCodec.create(it, slot, name, appInSlot(slot)) }
                     refresh()
                     addToFolder(slot)
                 }
-
-                MENU_ADD -> addToFolder(slot)
-                MENU_REMOVE -> folder?.let {
-                    showAppsDialog(context.getString(R.string.cesta_remove_app), it.apps) { app ->
-                        store.update { list -> FolderCodec.removeApp(list, slot, app) }
-                        refresh()
-                    }
+            }
+        } else {
+            options += R.string.cesta_add_app to { addToFolder(slot) }
+            if (folder.apps.isNotEmpty()) options += R.string.cesta_remove_app to {
+                showAppsDialog(context.getString(R.string.cesta_remove_app), folder.apps) { app ->
+                    store.update { list -> FolderCodec.removeApp(list, slot, app) }
+                    refresh()
                 }
-
-                MENU_RENAME -> folder?.let {
-                    askName(it.name) { name ->
-                        store.update { list -> FolderCodec.rename(list, slot, name) }
-                        refresh()
-                    }
+            }
+            options += R.string.cesta_rename_folder to {
+                askName(folder.name) { name ->
+                    store.update { list -> FolderCodec.rename(list, slot, name) }
+                    refresh()
                 }
-
-                MENU_DELETE -> context.createDialog(
+            }
+            options += R.string.cesta_delete_folder to {
+                context.createDialog(
                     title = R.string.cesta_delete_folder,
                     action = R.string.cesta_delete,
                     message = R.string.cesta_delete_folder_message,
@@ -109,6 +99,8 @@ class FolderUi(
                 ).showRespectingStatusBar()
             }
         }
+        val title = folder?.name ?: prefs.getAppName(slot).ifEmpty { context.getString(R.string.cesta_add) }
+        showListDialog(title, options.map { context.getString(it.first) }) { options[it].second() }
     }
 
     /** The app already in the slot becomes the first app of the new folder. */
@@ -156,7 +148,10 @@ class FolderUi(
         ).showRespectingStatusBar()
     }
 
-    private fun showAppsDialog(title: String, apps: List<FolderApp>, onPick: (FolderApp) -> Unit) {
+    private fun showAppsDialog(title: String, apps: List<FolderApp>, onPick: (FolderApp) -> Unit) =
+        showListDialog(title, apps.map { it.label }) { onPick(apps[it]) }
+
+    private fun showListDialog(title: String, labels: List<String>, onPick: (Int) -> Unit) {
         val dialog = OlDialog(context)
         val binding = DialogBaseBinding.inflate(LayoutInflater.from(dialog.context))
         binding.tvTitle.text = title
@@ -171,9 +166,9 @@ class FolderUi(
         val selectable = TypedValue().also {
             context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
         }.resourceId
-        apps.forEach { app ->
+        labels.forEachIndexed { index, label ->
             list.addView(TextView(context).apply {
-                text = app.label
+                text = label
                 setTextAppearance(R.style.TextLarge)
                 setTextColor(primaryColor())
                 gravity = prefs.homeAlignment
@@ -182,7 +177,7 @@ class FolderUi(
                 setBackgroundResource(selectable)
                 setOnClickListener {
                     dialog.dismiss()
-                    onPick(app)
+                    onPick(index)
                 }
             }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         }
@@ -192,12 +187,4 @@ class FolderUi(
         dialog.showRespectingStatusBar()
     }
 
-    private companion object {
-        const val MENU_CHOOSE_APP = 1
-        const val MENU_CREATE = 2
-        const val MENU_ADD = 3
-        const val MENU_REMOVE = 4
-        const val MENU_RENAME = 5
-        const val MENU_DELETE = 6
-    }
 }

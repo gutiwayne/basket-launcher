@@ -14,4 +14,6 @@
     <string name="cesta_folder_empty">Carpeta vacía. Mantén pulsado para añadir apps.</string>
     <string name="cesta_shortcuts_not_supported">Los accesos directos aún no se pueden añadir a carpetas</string>
     <string name="cesta_added_to_folder">Añadida a %1$s</string>
+    <string name="cesta_add">Añadir</string>
+    <string name="cesta_slot_hint">Añadir app o carpeta</string>
 </resources>

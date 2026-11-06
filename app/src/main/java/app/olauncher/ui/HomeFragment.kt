@@ -86,6 +86,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         setHomeAlignment(prefs.homeAlignment)
         initSwipeTouchListener()
         initClickListeners()
+        // Cesta: empty slots say what a long press does
+        for (slot in 1..8) homeSlotView(slot).hint = getString(R.string.cesta_slot_hint)
     }
 
     override fun onResume() {
@@ -143,7 +145,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     override fun onLongClick(view: View): Boolean {
         homeSlotOf(view)?.let { slot ->
-            folderUi.showSlotMenu(view, slot)
+            folderUi.showSlotMenu(slot)
             return true
         }
         when (view.id) {
