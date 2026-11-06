@@ -66,7 +66,8 @@ class ScreenshotSeed {
                 4 -> { prefs.appName4 = name; prefs.appPackage4 = pkg; prefs.appActivityClassName4 = activity; prefs.appUser4 = user.toString() }
             }
         }
-        // Clean first run: no tips, no prompts, no keyboard covering the drawer.
+        // Clean first run: no launcher chooser, tips, prompts or keyboard covering the drawer.
+        prefs.firstOpen = false
         prefs.firstSettingsOpen = false
         prefs.hideSetDefaultLauncher = true
         prefs.autoShowKeyboard = false

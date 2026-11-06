@@ -8,7 +8,13 @@ RUNNER=$PKG.test/androidx.test.runner.AndroidJUnitRunner
 OUT=screenshots
 mkdir -p "$OUT"
 
-shot() { sleep "${2:-2}"; adb exec-out screencap -p > "$OUT/$1.png"; echo "captured $1"; }
+# Fail loudly instead of capturing another app (e.g. a system dialog on top).
+in_cesta() {
+  local top
+  top=$(adb shell dumpsys activity activities | tr -d '\r' | grep -m1 -E "mResumedActivity|topResumedActivity" || true)
+  echo "$top" | grep -q "$PKG" || { echo "::error::foreground is not Cesta: $top"; exit 1; }
+}
+shot() { sleep "${2:-2}"; in_cesta; adb exec-out screencap -p > "$OUT/$1.png"; echo "captured $1"; }
 find_ui() { adb shell uiautomator dump /sdcard/ui.xml >/dev/null; adb pull -q /sdcard/ui.xml ui.xml; python3 .github/scripts/ui.py ui.xml "$1" "$2"; }
 read -r W H < <(adb shell wm size | tail -1 | grep -oE '[0-9]+x[0-9]+' | tr 'x' ' ')
 swipe_up() { adb shell input swipe $((W/2)) $((H*3/4)) $((W/2)) $((H/4)) 200; }
@@ -25,7 +31,10 @@ HOME_ACTIVITY=$(adb shell cmd package resolve-activity --brief -a android.intent
 adb shell cmd package set-home-activity "$HOME_ACTIVITY"
 adb shell settings put global policy_control immersive.navigation=* || true
 adb shell input keyevent KEYCODE_HOME
-shot 1-home 4
+sleep 3
+adb shell input keyevent KEYCODE_BACK   # dismiss anything a first launch may have opened
+adb shell input keyevent KEYCODE_HOME
+shot 1-home 3
 
 swipe_up
 shot 2-all-apps
