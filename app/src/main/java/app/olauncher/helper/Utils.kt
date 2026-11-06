@@ -210,6 +210,24 @@ fun isPackageInstalled(context: Context, packageName: String, userString: String
     return false
 }
 
+/**
+ * Cesta: indica si «la app no aparece» significa de verdad que se ha desinstalado.
+ * Falso si el perfil de ese usuario no está disponible, no está desbloqueado (justo tras arrancar)
+ * o está en modo silencioso (perfil de trabajo pausado, espacio privado bloqueado).
+ */
+fun isAppCheckReliable(context: Context, userString: String): Boolean {
+    return try {
+        val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
+        val handle = if (userString.isBlank()) android.os.Process.myUserHandle()
+        else userManager.userProfiles.firstOrNull { it.toString() == userString } ?: return false
+        if (!userManager.isUserUnlocked(handle)) return false
+        if (userManager.isQuietModeEnabled(handle)) return false
+        true
+    } catch (e: Exception) {
+        false
+    }
+}
+
 fun isPrivateSpaceProfile(context: Context, userHandle: UserHandle): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) return false
     return try {
