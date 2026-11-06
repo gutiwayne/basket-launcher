@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Cesta: create folders, reboot the emulator and check they are still there.
+# Cesta: create app lists, reboot the emulator and check they are still there.
 set -euo pipefail
 APP=app/build/outputs/apk/debug/app-debug.apk
 TEST=app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 RUNNER=io.github.jesusg703.cesta.debug.test/androidx.test.runner.AndroidJUnitRunner
-CLASS=app.olauncher.FolderPersistenceTest
+CLASS=app.olauncher.ListPersistenceTest
 
 run_test() {
   local out
@@ -25,8 +25,8 @@ wait_boot() {
 adb install -r "$APP"
 adb install -r "$TEST"
 
-echo "== 1. Create folders"
-run_test writeFolders
+echo "== 1. Create lists"
+run_test writeLists
 
 echo "== 2. Reboot the emulator"
 adb reboot
@@ -35,5 +35,5 @@ adb shell input keyevent 82 || true   # unlock screen
 sleep 5
 
 echo "== 3. Check they survived"
-run_test verifyFoldersAfterReboot
-echo "Folders intact after reboot"
+run_test verifyListsAfterReboot
+echo "Lists intact after reboot"

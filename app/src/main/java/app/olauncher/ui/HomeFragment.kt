@@ -28,7 +28,6 @@ import app.olauncher.MainViewModel
 import app.olauncher.R
 import app.olauncher.data.AppModel
 import app.olauncher.data.Constants
-import app.olauncher.data.FolderFlags
 import app.olauncher.data.Prefs
 import app.olauncher.databinding.FragmentHomeBinding
 import app.olauncher.helper.appUsagePermissionGranted
@@ -55,7 +54,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private lateinit var prefs: Prefs
     private lateinit var viewModel: MainViewModel
     private lateinit var deviceManager: DevicePolicyManager
-    private lateinit var folderUi: FolderUi
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -73,24 +71,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         } ?: throw Exception("Invalid Activity")
 
         deviceManager = context?.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        folderUi = FolderUi(
-            fragment = this,
-            prefs = prefs,
-            launchApp = {
-                if (it.shortcutId != null) launchShortcut(it.shortcutId, it.appPackage, it.label, it.user)
-                else launchApp(it.label, it.appPackage, it.activityClassName, it.user)
-            },
-            chooseApp = { slot -> showAppList(slot, prefs.getAppName(slot).isNotEmpty(), true) },
-            addToFolder = { slot -> showAppList(FolderFlags.ADD_TO_FOLDER_BASE + slot, includeHiddenApps = true) },
-            refresh = { populateHomeScreen(false) },
-        )
 
         initObservers()
         setHomeAlignment(prefs.homeAlignment)
         initSwipeTouchListener()
         initClickListeners()
-        // Cesta: empty slots say what a long press does
-        for (slot in 1..8) homeSlotView(slot).hint = getString(R.string.cesta_slot_hint)
     }
 
     override fun onResume() {
@@ -147,10 +132,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     override fun onLongClick(view: View): Boolean {
-        homeSlotOf(view)?.let { slot ->
-            folderUi.showSlotMenu(slot)
-            return true
-        }
         when (view.id) {
             R.id.homeApp1 -> showAppList(Constants.FLAG_SET_HOME_APP_1, prefs.appName1.isNotEmpty(), true)
             R.id.homeApp2 -> showAppList(Constants.FLAG_SET_HOME_APP_2, prefs.appName2.isNotEmpty(), true)
@@ -334,35 +315,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun populateHomeScreen(appCountUpdated: Boolean) {
-        populateHomeApps(appCountUpdated)
-        folderUi.applyToHome(::homeSlotView, prefs.homeAppsNum)
-    }
-
-    // Cesta: home slots 1..8
-    private fun homeSlotOf(view: View): Int? = when (view.id) {
-        R.id.homeApp1 -> 1
-        R.id.homeApp2 -> 2
-        R.id.homeApp3 -> 3
-        R.id.homeApp4 -> 4
-        R.id.homeApp5 -> 5
-        R.id.homeApp6 -> 6
-        R.id.homeApp7 -> 7
-        R.id.homeApp8 -> 8
-        else -> null
-    }
-
-    private fun homeSlotView(slot: Int): TextView = when (slot) {
-        1 -> binding.homeApp1
-        2 -> binding.homeApp2
-        3 -> binding.homeApp3
-        4 -> binding.homeApp4
-        5 -> binding.homeApp5
-        6 -> binding.homeApp6
-        7 -> binding.homeApp7
-        else -> binding.homeApp8
-    }
-
-    private fun populateHomeApps(appCountUpdated: Boolean) {
         if (appCountUpdated) hideHomeApps()
         populateDateTime()
 
@@ -569,7 +521,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun homeAppClicked(location: Int) {
-        if (folderUi.openIfFolder(location)) return
         launchAppOrShortcut(
             appName = prefs.getAppName(location),
             packageName = prefs.getAppPackage(location),
@@ -581,6 +532,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun openSwipeRightApp() {
+        if (openListPage(-1)) return // Cesta: side swipes move between app lists
         if (!prefs.swipeRightEnabled) return
         launchAppOrShortcut(
             appName = prefs.appNameSwipeRight,
@@ -594,6 +546,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun openSwipeLeftApp() {
+        if (openListPage(1)) return // Cesta
         if (!prefs.swipeLeftEnabled) return
         launchAppOrShortcut(
             appName = prefs.appNameSwipeLeft,
@@ -604,6 +557,18 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             userString = prefs.appUserSwipeLeft,
             fallback = { openCameraApp(requireContext()) }
         )
+    }
+
+    // Cesta: open the drawer on the next (+1) or previous (-1) app list instead of camera/dialer
+    private fun openListPage(step: Int): Boolean {
+        viewModel.getAppList()
+        val args = bundleOf(Constants.Key.FLAG to Constants.FLAG_LAUNCH_APP, ListPager.ARG_STEP to step)
+        try {
+            findNavController().navigate(R.id.action_mainFragment_to_appListFragment, args)
+        } catch (e: Exception) {
+            findNavController().navigate(R.id.appListFragment, args)
+        }
+        return true
     }
 
     private fun showAppList(flag: Int, rename: Boolean = false, includeHiddenApps: Boolean = false) {

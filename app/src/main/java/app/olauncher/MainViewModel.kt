@@ -19,11 +19,9 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import app.olauncher.data.AppModel
 import app.olauncher.data.Constants
-import app.olauncher.data.FolderFlags
 import app.olauncher.data.Prefs
 import app.olauncher.helper.SingleLiveEvent
 import app.olauncher.helper.WallpaperWorker
-import app.olauncher.helper.addAppToFolder
 import app.olauncher.helper.formattedTimeSpent
 import app.olauncher.helper.getAppsList
 import app.olauncher.helper.getPrivateSpaceApps
@@ -104,10 +102,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             Constants.FLAG_SET_CLOCK_APP -> saveClockApp(appModel)
             Constants.FLAG_SET_CALENDAR_APP -> saveCalendarApp(appModel)
             Constants.FLAG_SET_SCREEN_TIME_APP -> saveScreenTimeApp(appModel)
-            in FolderFlags.ADD_TO_FOLDER_RANGE -> { // Cesta
-                addAppToFolder(appContext, appModel, flag - FolderFlags.ADD_TO_FOLDER_BASE)
-                refreshHome.postValue(false)
-            }
         }
     }
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cesta: "Lists" action in the drawer's long-press row (same size and tint as upstream row icons). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="?attr/primaryColor"
+        android:pathData="M3,5h2v2H3zM7,5h14v2H7zM3,11h2v2H3zM7,11h14v2H7zM3,17h2v2H3zM7,17h14v2H7z" />
+</vector>

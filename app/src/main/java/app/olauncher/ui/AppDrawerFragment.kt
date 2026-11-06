@@ -50,6 +50,7 @@ class AppDrawerFragment : BaseFragment() {
     private var currentPrivateSpaceApps: List<AppModel>? = null
     private var currentPrivateSpaceLocked: Boolean = true
     private var currentPrivateSpaceAvailable: Boolean = false
+    private var listPager: ListPager? = null // Cesta
 
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentAppDrawerBinding? = null
@@ -75,6 +76,11 @@ class AppDrawerFragment : BaseFragment() {
         initViews()
         initSearch()
         initAdapter()
+        if (flag == Constants.FLAG_LAUNCH_APP) listPager = ListPager( // Cesta: app list pages
+            binding, prefs, arguments?.getInt(ListPager.ARG_STEP, 0) ?: 0,
+            itemAt = { adapter.appFilteredList.getOrNull(it) },
+            onPageChanged = { updateCombinedAppList() },
+        )
         initObservers()
         initClickListeners()
     }
@@ -303,7 +309,7 @@ class AppDrawerFragment : BaseFragment() {
             }
         }
 
-        adapter.setAppList(combined)
+        adapter.setAppList(listPager?.filter(combined) ?: combined)
         adapter.filter.filter(binding.search.query)
     }
 
@@ -381,6 +387,7 @@ class AppDrawerFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         searchTextView = null
+        listPager = null
         _binding = null
     }
 }

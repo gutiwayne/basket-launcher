@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cesta Launcher: folder strings -->
+<!-- Cesta Launcher: app list strings -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="cesta_choose_app">Choose app</string>
-    <string name="cesta_create_folder">Create folder</string>
-    <string name="cesta_add_app">Add app</string>
-    <string name="cesta_remove_app">Remove app</string>
-    <string name="cesta_rename_folder">Rename folder</string>
-    <string name="cesta_delete_folder">Delete folder</string>
-    <string name="cesta_delete_folder_message">The folder will be deleted. The apps stay installed.</string>
+    <string name="cesta_all_apps">All apps</string>
+    <string name="cesta_lists">Lists</string>
+    <string name="cesta_new_list">New list</string>
+    <string name="cesta_rename_list">Rename list</string>
+    <string name="cesta_move_left">Move left</string>
+    <string name="cesta_move_right">Move right</string>
+    <string name="cesta_delete_list">Delete list</string>
+    <string name="cesta_delete_list_message">The list will be deleted. The apps stay installed.</string>
     <string name="cesta_delete">Delete</string>
     <string name="cesta_save">Save</string>
-    <string name="cesta_folder_name">Folder name</string>
-    <string name="cesta_folder_default_name">Folder</string>
-    <string name="cesta_folder_empty">Empty folder. Long press to add apps.</string>
-    <string name="cesta_reorder_apps">Reorder apps</string>
-    <string name="cesta_reorder_title">Tap an app to move it up</string>
-    <string name="cesta_sort_apps">Sort A–Z</string>
-    <string name="cesta_added_to_folder">Added to %1$s</string>
-    <string name="cesta_folder_suffix" translatable="false"> ›</string>
-    <string name="cesta_add">Add</string>
-    <string name="cesta_slot_hint">Add app or folder</string>
+    <string name="cesta_list_name">List name</string>
+    <string name="cesta_list_default_name">List</string>
+    <string name="cesta_list_empty">Empty list. In All apps, long press an app → Lists to add it.</string>
 </resources>

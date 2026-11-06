@@ -1,6 +1,6 @@
 # Cesta Launcher
 
-A minimal Android launcher with **home screen folders**.
+A minimal Android launcher with **app lists you swipe between**.
 
 Cesta Launcher is a fork of [Olauncher](https://github.com/tanujnotes/Olauncher) by
 [tanujnotes](https://github.com/tanujnotes). All the credit for the launcher itself goes to
@@ -10,9 +10,11 @@ the original author; this fork only adds a few things on top and follows upstrea
 
 ## What is different from Olauncher
 
-- **Folders on the home screen.** Long press a home slot → *Create folder*. The app already in
-  that slot becomes the first app of the folder. Long press a folder to add, remove, rename or
-  delete it; tap it to open.
+- **App lists.** Swipe up for *All apps* as usual, then swipe left or right to move between your
+  own lists (e.g. *Work*, *Server*), each with the same search box limited to its apps. From the
+  home screen, a side swipe opens the next or previous list directly (instead of camera/dialer).
+  - Long press an app → **Lists** to add it to or remove it from any list.
+  - Long press the list name above the search box to create, rename, move or delete lists.
 - **Home apps survive reboots.** Right after boot, or while the work profile or private space is
   locked, Android may briefly report apps as missing. Olauncher then cleared that home slot for
   good; Cesta only clears it when the app was really uninstalled.
@@ -41,7 +43,7 @@ Cesta Launcher does not collect, store or share any data. It has no analytics an
 - The optional **daily wallpaper** downloads images from the Olauncher wallpaper list
   (a GitHub gist by the original author) and Unsplash. Nothing is sent about you.
 - The optional **double tap to lock** uses the Accessibility Service only to lock the screen.
-- Folders and settings stay in the app's private storage on your phone.
+- Lists and settings stay in the app's private storage on your phone.
 
 ## How this fork is maintained
 
@@ -51,10 +53,10 @@ Cesta Launcher does not collect, store or share any data. It has no analytics an
 | `carpetas` | Cesta Launcher (default branch) |
 
 - Every Monday a workflow merges upstream into `carpetas`, runs the tests and pushes it.
-- Fork changes live in separate files (`data/Folders.kt`, `ui/FolderUi.kt`, `src/cesta/res`, …)
+- Fork changes live in separate files (`data/AppLists.kt`, `ui/ListPager.kt`, `src/cesta/res`, …)
   and an appended block in `app/build.gradle`, so upstream merges stay clean.
-- Every push runs unit tests, lint and an emulator test that creates folders, **reboots the
-  device** and checks they are still there.
+- Every push runs unit tests, lint and an emulator test that creates app lists, **reboots the
+  device** and checks the lists are still there.
 - Fixes that also help Olauncher are proposed upstream.
 
 Build locally with `./gradlew assembleDebug` (JDK 17, Android SDK).

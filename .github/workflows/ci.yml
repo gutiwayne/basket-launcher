@@ -54,7 +54,7 @@ jobs:
           retention-days: 14
 
   reboot:
-    name: Folders after reboot (emulator)
+    name: Lists after reboot (emulator)
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -77,7 +77,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Create folders, reboot and verify
+      - name: Create lists, reboot and verify
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: 34
