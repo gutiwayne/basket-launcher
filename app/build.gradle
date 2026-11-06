@@ -87,4 +87,7 @@ android {
 dependencies {
     // Implementación real de org.json para los tests JVM de las carpetas (en android.jar es un stub).
     testImplementation "org.json:json:20260814"
+    // Prueba de reinicio en emulador (CI)
+    androidTestImplementation "androidx.test:runner:1.7.0"
+    androidTestImplementation "androidx.test.ext:junit:1.3.0"
 }
