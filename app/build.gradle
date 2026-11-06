@@ -82,6 +82,20 @@ android {
         // Errores que ya trae el original; el CI solo falla por errores nuevos.
         baseline = file("lint-baseline.xml")
     }
+    // Firma de release: solo en CI (workflow release.yml), con la clave guardada como secreto.
+    def cestaKeystore = System.getenv("CESTA_KEYSTORE")
+    if (cestaKeystore) {
+        signingConfigs {
+            cesta {
+                storeFile file(cestaKeystore)
+                storePassword System.getenv("CESTA_KEYSTORE_PASSWORD")
+                keyAlias "cesta"
+                keyPassword System.getenv("CESTA_KEYSTORE_PASSWORD")
+                storeType "pkcs12"
+            }
+        }
+        buildTypes.release.signingConfig signingConfigs.cesta
+    }
 }
 
 dependencies {
