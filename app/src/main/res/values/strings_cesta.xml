@@ -14,4 +14,6 @@
     <string name="cesta_list_name">List name</string>
     <string name="cesta_list_default_name">List</string>
     <string name="cesta_list_empty">Empty list. In All apps, long press an app → Lists to add it.</string>
+    <string name="cesta_previous_list">Previous list</string>
+    <string name="cesta_next_list">Next list</string>
 </resources>

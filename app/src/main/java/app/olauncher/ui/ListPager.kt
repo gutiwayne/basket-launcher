@@ -33,7 +33,8 @@ import kotlin.math.abs
 /**
  * Cesta Launcher: pages in the app drawer. Page 0 is "All apps"; each user list is one more page.
  * - Swipe left/right anywhere in the drawer to change page (wraps around).
- * - The page name sits above the search box, with dots for the position; long press it to manage lists.
+ * - The page name sits above the search box, with ‹ › arrows on its right and dots for the position;
+ *   long press the name to manage lists.
  * - Long press an app → "Lists" to add it to or remove it from any list.
  * Search works the same on every page, limited to that page's apps.
  */
@@ -57,6 +58,8 @@ class ListPager(
     }
 
     private val title = TextView(context)
+    private val previous = TextView(context)
+    private val next = TextView(context)
     private val dots = TextView(context)
 
     init {
@@ -97,10 +100,12 @@ class ListPager(
     private fun render() {
         title.text = pageName()
         dots.isVisible = lists.isNotEmpty()
+        previous.isVisible = lists.isNotEmpty()
+        next.isVisible = lists.isNotEmpty()
         dots.text = (0..lists.size).joinToString("  ") { if (it == page) "●" else "○" }
     }
 
-    // --- Header: page name above the search box, dots below the list ---
+    // --- Header: page name above the search box with ‹ › on its right, dots below the list ---
 
     private fun setUpHeader() {
         val root = binding.root as LinearLayout
@@ -108,11 +113,37 @@ class ListPager(
         title.apply {
             setTextAppearance(R.style.TextSmall)
             alpha = 0.6f
-            gravity = prefs.appLabelAlignment
-            setPadding(24.dpToPx(), 0, 24.dpToPx(), 4.dpToPx())
+            gravity = prefs.appLabelAlignment or android.view.Gravity.CENTER_VERTICAL
+            setPadding(24.dpToPx(), 0, 8.dpToPx(), 0)
             setOnLongClickListener { showManageDialog(); true }
         }
-        root.addView(title, root.indexOfChild(searchRow), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        val selectable = TypedValue().also {
+            context.theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, it, true)
+        }.resourceId
+        listOf(previous to "‹", next to "›").forEach { (arrow, glyph) ->
+            arrow.apply {
+                text = glyph
+                setTextAppearance(R.style.TextLarge)
+                alpha = 0.35f // discreet, like the dots
+                gravity = android.view.Gravity.CENTER
+                minWidth = 40.dpToPx()  // comfortable touch target for a small glyph
+                minHeight = 40.dpToPx()
+                includeFontPadding = false
+                setBackgroundResource(selectable)
+                contentDescription = context.getString(if (arrow === previous) R.string.cesta_previous_list else R.string.cesta_next_list)
+            }
+        }
+        previous.setOnClickListener { goTo(page - 1) }
+        next.setOnClickListener { goTo(page + 1) }
+        val header = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding(0, 0, 16.dpToPx(), 0)
+            addView(title, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            addView(previous, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+            addView(next, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        }
+        root.addView(header, root.indexOfChild(searchRow), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         dots.apply {
             setTextAppearance(R.style.TextSmall)
             alpha = 0.5f
