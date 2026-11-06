@@ -8,6 +8,7 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -170,12 +171,39 @@ class ListPager(
                 return true
             }
         })
-        // Over the app list: observe touches without stealing them, so taps and vertical scroll keep working.
-        binding.recyclerView.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
+        // Over the app list: taps and vertical scroll pass through, but once a drag is clearly horizontal
+        // the list takes it over, so the app under the finger gets ACTION_CANCEL and is not launched.
+        val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+        binding.recyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            private var downX = 0f
+            private var downY = 0f
+
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                detector.onTouchEvent(e)
+                when (e.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        downX = e.x
+                        downY = e.y
+                    }
+
+                    MotionEvent.ACTION_MOVE -> {
+                        val dx = e.x - downX
+                        val dy = e.y - downY
+                        if (abs(dx) > touchSlop * 2 && abs(dx) > abs(dy) * 1.5f) {
+                            rv.parent?.requestDisallowInterceptTouchEvent(true)
+                            return true
+                        }
+                    }
+                }
                 return false
             }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+                if (e.actionMasked != MotionEvent.ACTION_UP) return
+                val dx = e.x - downX
+                if (abs(dx) >= SWIPE_MIN_DISTANCE_DP.dpToPx()) goTo(if (dx < 0) page + 1 else page - 1)
+            }
+
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
         })
         // Over the empty parts of the drawer.
         binding.root.setOnTouchListener { _, e -> detector.onTouchEvent(e) }

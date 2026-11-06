@@ -21,6 +21,7 @@ swipe_up() { adb shell input swipe $((W/2)) $((H*3/4)) $((W/2)) $((H/4)) 200; }
 swipe_to_previous() { adb shell input swipe $((W/6)) $((H/2)) $((W*5/6)) $((H/2)) 150; }
 
 adb install -r "$APP"
+adb shell settings put secure show_ime_with_hard_keyboard 1   # show the on-screen keyboard, as on a phone
 adb install -r "$TEST"
 seed=$(adb shell am instrument -w -e class app.olauncher.ScreenshotSeed "$RUNNER" | tr -d '\r')
 echo "$seed" | grep -E "CESTA_SEED|OK \(|FAILURES" || true
