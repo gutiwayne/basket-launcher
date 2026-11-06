@@ -391,7 +391,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         val userHandle = getUserHandleFromString(requireContext(), userString)
 
         // If it's a shortcut, verify it still exists
-        if (isShortcut) {
+        // Pinned shortcuts need API 25 (and can only be pinned from API 26)
+        if (isShortcut && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val launcherApps = requireContext().getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
 
             // Query for the specific shortcut

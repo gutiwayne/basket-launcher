@@ -1,10 +1,14 @@
 package app.olauncher.helper
 
 import android.content.pm.LauncherApps
+import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import app.olauncher.R
 
+// Only started by the system for pin requests, which exist since Android 8.0
+@RequiresApi(Build.VERSION_CODES.O)
 class PinItemActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
