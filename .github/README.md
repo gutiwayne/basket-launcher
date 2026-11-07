@@ -26,7 +26,7 @@ Everything else (gestures, hidden apps, screen time, daily wallpapers…) is Ola
 
 ## Install
 
-Download the APK from [Releases](https://github.com/jesusg703/basket-launcher/releases) and open it on
+Download the APK from [Releases](https://github.com/gutiwayne/basket-launcher/releases) and open it on
 your phone. Check the file against the `.sha256` next to it.
 
 Releases are signed with this certificate (SHA-256):
@@ -65,4 +65,4 @@ Build locally with `./gradlew assembleDebug` (JDK 17, Android SDK).
 ## License
 
 [GPL-3.0](../LICENSE), same as Olauncher. Olauncher © tanujnotes; folder support and other
-changes © jesusg703.
+changes © gutiwayne.
