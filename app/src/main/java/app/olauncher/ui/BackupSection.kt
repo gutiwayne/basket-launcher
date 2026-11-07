@@ -147,7 +147,7 @@ class BackupSection(private val fragment: Fragment) {
     }
 
     companion object {
-        private const val MIN_PROGRESS_MS = 600L
+        private const val MIN_PROGRESS_MS = 1_200L
 
         /**
          * True while the system file picker is in front. The launcher normally goes back to the home screen
