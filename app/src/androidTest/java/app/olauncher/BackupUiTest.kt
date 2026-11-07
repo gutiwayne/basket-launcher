@@ -96,9 +96,15 @@ class BackupUiTest {
             val x = device.displayWidth / 2
             val y = device.displayHeight / 2
             device.swipe(x, y, x, y, 300) // long press on the empty home screen opens Settings
+            Thread.sleep(1_000)
+            shot("after-long-press")
 
             // --- Export ---
-            scrollToText("Export settings").click()
+            val export = scrollToText("Export settings")
+            shot("export-visible")
+            export.click()
+            Thread.sleep(1_500)
+            shot("after-export-click")
             waitFor(picker, "file picker (export)")
             shot("export-picker")
             var save = waitFor(By.text(Pattern.compile("(?i)save")).clickable(true), "Save button")

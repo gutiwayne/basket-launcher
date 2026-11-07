@@ -53,8 +53,11 @@ echo "Backup and list cleanup OK"
 
 echo "== 6. Backup through the real UI and the system file picker"
 ui_status=0
+adb logcat -c
 ( run_test exportThenImportThroughSystemPicker app.olauncher.BackupUiTest ) || ui_status=$?
 mkdir -p ui-test
+adb logcat -d > ui-test/logcat.txt || true
+adb shell dumpsys activity activities > ui-test/activities.txt || true
 adb pull /sdcard/Android/data/io.github.jesusg703.cesta.debug/files/ui-test/. ui-test/ || true
 ls ui-test
 exit "$ui_status"
