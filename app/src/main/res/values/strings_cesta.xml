@@ -29,5 +29,6 @@
     <string name="cesta_backup_export_failed">Could not export settings</string>
     <string name="cesta_backup_imported">Imported %1$d settings and %2$d lists</string>
     <string name="cesta_backup_imported_skipped">Imported %1$d settings and %2$d lists. %3$d apps not installed were skipped.</string>
+    <string name="cesta_backup_importing">Importing…</string>
     <string name="cesta_backup_import_failed">Could not import: %1$s</string>
 </resources>

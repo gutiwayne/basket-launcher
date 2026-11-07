@@ -4,17 +4,21 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import app.olauncher.R
 import app.olauncher.data.BackupFormatException
 import app.olauncher.data.ImportResult
 import app.olauncher.data.SettingsBackupStore
+import app.olauncher.databinding.CestaDialogProgressBinding
 import app.olauncher.databinding.CestaSettingsBackupBinding
 import app.olauncher.databinding.FragmentSettingsBinding
+import app.olauncher.helper.OlDialog
 import app.olauncher.helper.createDialog
 import app.olauncher.helper.showToast
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -79,7 +83,9 @@ class BackupSection(private val fragment: Fragment) {
 
     private fun import(uri: Uri) {
         val context = fragment.context?.applicationContext ?: return
+        val progress = showProgress(R.string.cesta_backup_importing)
         fragment.lifecycleScope.launch {
+            val started = System.currentTimeMillis()
             val result: Result<ImportResult> = withContext(Dispatchers.IO) {
                 try {
                     Result.success(SettingsBackupStore(context).importFrom(uri))
@@ -91,19 +97,42 @@ class BackupSection(private val fragment: Fragment) {
                     Result.failure(e)
                 }
             }
-            result.fold(
+            // Keep the dialog up long enough to be seen, even when the import is instant.
+            delay((MIN_PROGRESS_MS - (System.currentTimeMillis() - started)).coerceAtLeast(0))
+            val message = result.fold(
                 onSuccess = { r ->
-                    val message = if (r.skippedSlots > 0)
+                    if (r.skippedSlots > 0)
                         context.getString(R.string.cesta_backup_imported_skipped, r.settings, r.lists, r.skippedSlots)
                     else context.getString(R.string.cesta_backup_imported, r.settings, r.lists)
-                    context.showToast(message, android.widget.Toast.LENGTH_LONG)
-                    // Theme, text size and home apps are read at start-up: restart the launcher UI.
-                    fragment.activity?.recreate()
                 },
-                onFailure = { e ->
-                    context.showToast(context.getString(R.string.cesta_backup_import_failed, e.message ?: ""))
-                },
+                onFailure = { e -> context.getString(R.string.cesta_backup_import_failed, e.message ?: "") },
             )
+            val activity = fragment.activity
+            val done = {
+                context.showToast(message, android.widget.Toast.LENGTH_LONG)
+                // Theme, text size and home apps are read at start-up: restart the launcher UI.
+                if (result.isSuccess) activity?.recreate()
+            }
+            // Recreate only once the dialog is fully gone (it fades out), so it is not left on a dead window.
+            if (progress == null) done() else {
+                progress.setOnDismissListener { done() }
+                progress.dismiss()
+            }
         }
+    }
+
+    private fun showProgress(@StringRes text: Int): OlDialog? {
+        val context = fragment.context ?: return null
+        val dialog = OlDialog(context)
+        val binding = CestaDialogProgressBinding.inflate(LayoutInflater.from(dialog.context))
+        binding.cestaProgressText.setText(text)
+        dialog.setView(binding.root)
+        dialog.setCancelable(false)
+        dialog.showRespectingStatusBar()
+        return dialog
+    }
+
+    private companion object {
+        const val MIN_PROGRESS_MS = 600L
     }
 }

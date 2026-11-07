@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-# Cesta: create app lists, reboot the emulator and check they are still there.
+# Cesta: create app lists, reboot the emulator and check they are still there;
+# then export/import settings and check that uninstalling an app cleans the lists.
 set -euo pipefail
 APP=app/build/outputs/apk/debug/app-debug.apk
 TEST=app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 RUNNER=io.github.jesusg703.cesta.debug.test/androidx.test.runner.AndroidJUnitRunner
 CLASS=app.olauncher.ListPersistenceTest
+BACKUP=app.olauncher.BackupAndCleanupTest
 
 run_test() {
   local out
-  out=$(adb shell am instrument -w -r -e class "$CLASS#$1" "$RUNNER" | tr -d '\r')
+  out=$(adb shell am instrument -w -r -e class "${2:-$CLASS}#$1" "$RUNNER" | tr -d '\r')
   echo "$out" | grep -E "INSTRUMENTATION_STATUS: (test|stack)=|OK \(|FAILURES" || true
   echo "$out" | grep -q "^OK (1 test)" || { echo "$out"; echo "::error::$1 failed"; exit 1; }
 }
@@ -37,3 +39,14 @@ sleep 5
 echo "== 3. Check they survived"
 run_test verifyListsAfterReboot
 echo "Lists intact after reboot"
+
+echo "== 4. Export and import settings"
+run_test exportImportKeepsListApps "$BACKUP"
+
+echo "== 5. Uninstalling an app deletes the lists left without apps"
+run_test writeListWithTestPackage "$BACKUP"
+adb uninstall io.github.jesusg703.cesta.debug.test
+sleep 5
+adb install -r "$TEST"
+run_test verifyUninstalledListDeleted "$BACKUP"
+echo "Backup and list cleanup OK"
