@@ -16,4 +16,17 @@
     <string name="cesta_list_empty">Empty list. In All apps, long press an app → Lists to add it.</string>
     <string name="cesta_previous_list">Previous list</string>
     <string name="cesta_next_list">Next list</string>
+    <!-- Settings backup -->
+    <string name="cesta_backup">Backup</string>
+    <string name="cesta_backup_export">Export settings</string>
+    <string name="cesta_backup_import">Import settings</string>
+    <string name="cesta_backup_note">Settings, home apps, custom app names and lists. Hidden apps are not included.</string>
+    <string name="cesta_backup_import_title">Import settings?</string>
+    <string name="cesta_backup_import_message">Settings and home apps from the file replace the current ones. Lists from the file are added to yours; nothing is deleted. Apps not installed on this device are skipped.</string>
+    <string name="cesta_backup_import_action">Import</string>
+    <string name="cesta_backup_exported">Settings exported</string>
+    <string name="cesta_backup_export_failed">Could not export settings</string>
+    <string name="cesta_backup_imported">Imported %1$d settings and %2$d lists</string>
+    <string name="cesta_backup_imported_skipped">Imported %1$d settings and %2$d lists. %3$d apps not installed were skipped.</string>
+    <string name="cesta_backup_import_failed">Could not import: %1$s</string>
 </resources>
