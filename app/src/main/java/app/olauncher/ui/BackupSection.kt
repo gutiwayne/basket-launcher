@@ -49,7 +49,8 @@ class BackupSection(private val fragment: Fragment) {
         val section = CestaSettingsBackupBinding.inflate(LayoutInflater.from(fragment.requireContext()), container, false)
         container.addView(section.root, container.indexOfChild(links))
         section.cestaBackupExport.setOnClickListener {
-            val date = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
+            // Date and time, so a second export the same day does not become "….json (1)" next to an older file.
+            val date = SimpleDateFormat("yyyy-MM-dd-HHmm", Locale.ROOT).format(Date())
             openPicker { exportLauncher.launch("cesta-launcher-$date.json") }
         }
         section.cestaBackupImport.setOnClickListener {
