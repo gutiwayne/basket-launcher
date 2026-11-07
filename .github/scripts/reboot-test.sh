@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # Cesta: create app lists, reboot the emulator and check they are still there;
 # then export/import settings and check that uninstalling an app cleans the lists.
+# Real device: TABLET=1 APP=… TEST=… ANDROID_SERIAL=… .github/scripts/reboot-test.sh
+# (skips the reboot steps; the APKs come from the CI artifact cesta-device-test-apks).
 set -euo pipefail
-APP=app/build/outputs/apk/debug/app-debug.apk
-TEST=app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+APP=${APP:-app/build/outputs/apk/debug/app-debug.apk}
+TEST=${TEST:-app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk}
+TABLET=${TABLET:-0}
 RUNNER=io.github.jesusg703.cesta.debug.test/androidx.test.runner.AndroidJUnitRunner
 CLASS=app.olauncher.ListPersistenceTest
 BACKUP=app.olauncher.BackupAndCleanupTest
@@ -24,21 +27,29 @@ wait_boot() {
   echo "::error::the emulator did not finish booting"; exit 1
 }
 
+if [ "$TABLET" = 1 ]; then
+  # Each CI run signs debug builds with a new key: replace, do not update.
+  adb uninstall io.github.jesusg703.cesta.debug >/dev/null 2>&1 || true
+  adb uninstall io.github.jesusg703.cesta.debug.test >/dev/null 2>&1 || true
+  adb shell input keyevent KEYCODE_WAKEUP || true
+fi
 adb install -r "$APP"
 adb install -r "$TEST"
 
-echo "== 1. Create lists"
-run_test writeLists
+if [ "$TABLET" != 1 ]; then
+  echo "== 1. Create lists"
+  run_test writeLists
 
-echo "== 2. Reboot the emulator"
-adb reboot
-wait_boot
-adb shell input keyevent 82 || true   # unlock screen
-sleep 5
+  echo "== 2. Reboot the emulator"
+  adb reboot
+  wait_boot
+  adb shell input keyevent 82 || true   # unlock screen
+  sleep 5
 
-echo "== 3. Check they survived"
-run_test verifyListsAfterReboot
-echo "Lists intact after reboot"
+  echo "== 3. Check they survived"
+  run_test verifyListsAfterReboot
+  echo "Lists intact after reboot"
+fi
 
 echo "== 4. Export and import settings"
 run_test exportImportKeepsListApps "$BACKUP"
@@ -67,10 +78,14 @@ HOME_ACTIVITY=$(adb shell cmd package resolve-activity --brief -a android.intent
 for attempt in 1 2 3 4 5; do
   adb shell cmd role add-role-holder android.app.role.HOME "$PKG" 0 2>/dev/null \
     || adb shell cmd package set-home-activity "$HOME_ACTIVITY" 2>/dev/null || true
-  adb shell cmd role get-role-holders android.app.role.HOME | tr -d '\r' | grep -q "$PKG" && break
+  { adb shell cmd role get-role-holders android.app.role.HOME 2>/dev/null; adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME; } | tr -d '\r' | grep -q "$PKG" && break
   echo "home role not set yet (attempt $attempt)"; sleep 3
 done
-adb shell cmd role get-role-holders android.app.role.HOME | tr -d '\r' | grep -q "$PKG" || { echo "::error::could not make Cesta the home app"; exit 1; }
+home_is_cesta() {
+  adb shell cmd role get-role-holders android.app.role.HOME 2>/dev/null | tr -d '\r' | grep -q "$PKG" \
+    || adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME | tr -d '\r' | tail -1 | grep -q "$PKG"
+}
+home_is_cesta || { echo "::error::could not make Cesta the home app"; exit 1; }
 adb shell input keyevent KEYCODE_HOME
 sleep 3
 ui_status=0
