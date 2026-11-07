@@ -78,7 +78,7 @@ dependencies {
 // Fork-specific changes live in a separate block so upstream merges do not conflict.
 android {
     defaultConfig {
-        applicationId "io.github.jesusg703.cesta"
+        applicationId "io.github.gutiwayne.basket"
         versionNameSuffix "-basket"
         // English only: drop upstream translations.
         resourceConfigurations.clear()
