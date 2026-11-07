@@ -11,7 +11,7 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 
-// Cesta Launcher: export/import of the launcher configuration as a JSON file, to move it between devices.
+// Basket Launcher: export/import of the launcher configuration as a JSON file, to move it between devices.
 // An imported file is untrusted input: only known keys with the expected type and range are applied,
 // everything else is ignored. Hidden apps, accessibility/lock state, wallpaper URL and first-run
 // bookkeeping are never exported or imported.
@@ -27,7 +27,10 @@ data class Backup(
 
 /** Pure logic (no Android dependencies, covered by JVM tests). */
 object SettingsBackupCodec {
-    const val FORMAT = "cesta-launcher-backup"
+    const val FORMAT = "basket-launcher-backup"
+
+    /** Written by builds released as Cesta Launcher (the earlier name); still accepted on import. */
+    const val LEGACY_FORMAT = "cesta-launcher-backup"
     const val VERSION = 1
     const val MAX_BYTES = 512 * 1024
     private const val MAX_LISTS = 100
@@ -117,7 +120,7 @@ object SettingsBackupCodec {
             .toString(2)
     }
 
-    /** Throws [BackupFormatException] if [json] is not a Cesta backup this version can read. */
+    /** Throws [BackupFormatException] if [json] is not a Basket backup this version can read. */
     fun parse(json: String): Backup {
         if (json.length > MAX_BYTES) throw BackupFormatException("File too large")
         val root = try {
@@ -125,7 +128,7 @@ object SettingsBackupCodec {
         } catch (e: JSONException) {
             throw BackupFormatException("Not a JSON file")
         }
-        if (root.optString("format") != FORMAT) throw BackupFormatException("Not a Cesta Launcher backup")
+        if (root.optString("format") !in setOf(FORMAT, LEGACY_FORMAT)) throw BackupFormatException("Not a Basket Launcher backup")
         val version = root.optInt("v", -1)
         if (version < 1 || version > VERSION) throw BackupFormatException("Unsupported backup version $version")
 

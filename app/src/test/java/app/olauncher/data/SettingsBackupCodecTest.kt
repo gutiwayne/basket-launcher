@@ -31,7 +31,7 @@ class SettingsBackupCodecTest {
     )
 
     private fun backup(settings: String = "{}", extra: String = "") =
-        """{"format":"cesta-launcher-backup","v":1,"settings":$settings$extra}"""
+        """{"format":"basket-launcher-backup","v":1,"settings":$settings$extra}"""
 
     @Test
     fun roundTripKeepsPortableSettingsOnly() {
@@ -67,9 +67,14 @@ class SettingsBackupCodecTest {
         SettingsBackupCodec.parse("""{"format":"something-else","v":1}""")
     }
 
+    @Test
+    fun acceptsBackupsFromTheCestaName() {
+        SettingsBackupCodec.parse("""{"format":"cesta-launcher-backup","v":1,"settings":{}}""")
+    }
+
     @Test(expected = BackupFormatException::class)
     fun rejectsNewerVersions() {
-        SettingsBackupCodec.parse("""{"format":"cesta-launcher-backup","v":99}""")
+        SettingsBackupCodec.parse("""{"format":"basket-launcher-backup","v":99}""")
     }
 
     @Test(expected = BackupFormatException::class)
@@ -159,7 +164,7 @@ class SettingsBackupCodecTest {
     @Test
     fun exportIsValidJsonWithHeader() {
         val root = JSONObject(SettingsBackupCodec.export(prefs, emptyList()))
-        assertEquals("cesta-launcher-backup", root.getString("format"))
+        assertEquals("basket-launcher-backup", root.getString("format"))
         assertEquals(1, root.getInt("v"))
     }
 }

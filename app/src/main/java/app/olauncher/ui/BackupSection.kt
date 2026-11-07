@@ -12,8 +12,8 @@ import app.olauncher.R
 import app.olauncher.data.BackupFormatException
 import app.olauncher.data.ImportResult
 import app.olauncher.data.SettingsBackupStore
-import app.olauncher.databinding.CestaDialogProgressBinding
-import app.olauncher.databinding.CestaSettingsBackupBinding
+import app.olauncher.databinding.BasketDialogProgressBinding
+import app.olauncher.databinding.BasketSettingsBackupBinding
 import app.olauncher.databinding.FragmentSettingsBinding
 import app.olauncher.helper.OlDialog
 import app.olauncher.helper.createDialog
@@ -28,7 +28,7 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Cesta Launcher: "Backup" section of the settings screen (export/import through the system file picker).
+ * Basket Launcher: "Backup" section of the settings screen (export/import through the system file picker).
  * Create it as a property of the fragment, so the result launchers are registered before the fragment starts.
  */
 class BackupSection(private val fragment: Fragment) {
@@ -46,14 +46,14 @@ class BackupSection(private val fragment: Fragment) {
     fun attach(settings: FragmentSettingsBinding) {
         val links = settings.privacy.parent as? ViewGroup ?: return
         val container = links.parent as? ViewGroup ?: return
-        val section = CestaSettingsBackupBinding.inflate(LayoutInflater.from(fragment.requireContext()), container, false)
+        val section = BasketSettingsBackupBinding.inflate(LayoutInflater.from(fragment.requireContext()), container, false)
         container.addView(section.root, container.indexOfChild(links))
-        section.cestaBackupExport.setOnClickListener {
+        section.basketBackupExport.setOnClickListener {
             // Date and time, so a second export the same day does not become "….json (1)" next to an older file.
             val date = SimpleDateFormat("yyyy-MM-dd-HHmm", Locale.ROOT).format(Date())
-            openPicker { exportLauncher.launch("cesta-launcher-$date.json") }
+            openPicker { exportLauncher.launch("basket-launcher-$date.json") }
         }
-        section.cestaBackupImport.setOnClickListener {
+        section.basketBackupImport.setOnClickListener {
             openPicker { importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }
         }
     }
@@ -64,7 +64,7 @@ class BackupSection(private val fragment: Fragment) {
             launch()
         } catch (e: ActivityNotFoundException) {
             pickerOpen = false
-            fragment.context?.showToast(R.string.cesta_backup_no_picker)
+            fragment.context?.showToast(R.string.basket_backup_no_picker)
         }
     }
 
@@ -81,23 +81,23 @@ class BackupSection(private val fragment: Fragment) {
                     false
                 }
             }
-            context.showToast(if (ok) R.string.cesta_backup_exported else R.string.cesta_backup_export_failed)
+            context.showToast(if (ok) R.string.basket_backup_exported else R.string.basket_backup_export_failed)
         }
     }
 
     private fun confirmImport(uri: Uri) {
         val context = fragment.context ?: return
         context.createDialog(
-            title = R.string.cesta_backup_import_title,
-            action = R.string.cesta_backup_import_action,
-            message = R.string.cesta_backup_import_message,
+            title = R.string.basket_backup_import_title,
+            action = R.string.basket_backup_import_action,
+            message = R.string.basket_backup_import_message,
             onAction = { import(uri) },
         ).showRespectingStatusBar()
     }
 
     private fun import(uri: Uri) {
         val context = fragment.context?.applicationContext ?: return
-        val progress = showProgress(R.string.cesta_backup_importing)
+        val progress = showProgress(R.string.basket_backup_importing)
         fragment.lifecycleScope.launch {
             val started = System.currentTimeMillis()
             val result: Result<ImportResult> = withContext(Dispatchers.IO) {
@@ -116,10 +116,10 @@ class BackupSection(private val fragment: Fragment) {
             val message = result.fold(
                 onSuccess = { r ->
                     if (r.skippedSlots > 0)
-                        context.getString(R.string.cesta_backup_imported_skipped, r.settings, r.lists, r.skippedSlots)
-                    else context.getString(R.string.cesta_backup_imported, r.settings, r.lists)
+                        context.getString(R.string.basket_backup_imported_skipped, r.settings, r.lists, r.skippedSlots)
+                    else context.getString(R.string.basket_backup_imported, r.settings, r.lists)
                 },
-                onFailure = { e -> context.getString(R.string.cesta_backup_import_failed, e.message ?: "") },
+                onFailure = { e -> context.getString(R.string.basket_backup_import_failed, e.message ?: "") },
             )
             val activity = fragment.activity
             val done = {
@@ -138,8 +138,8 @@ class BackupSection(private val fragment: Fragment) {
     private fun showProgress(@StringRes text: Int): OlDialog? {
         val context = fragment.context ?: return null
         val dialog = OlDialog(context)
-        val binding = CestaDialogProgressBinding.inflate(LayoutInflater.from(dialog.context))
-        binding.cestaProgressText.setText(text)
+        val binding = BasketDialogProgressBinding.inflate(LayoutInflater.from(dialog.context))
+        binding.basketProgressText.setText(text)
         dialog.setView(binding.root)
         dialog.setCancelable(false)
         dialog.showRespectingStatusBar()

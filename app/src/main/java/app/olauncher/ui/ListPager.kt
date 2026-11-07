@@ -32,7 +32,7 @@ import app.olauncher.helper.showToast
 import kotlin.math.abs
 
 /**
- * Cesta Launcher: pages in the app drawer. Page 0 is "All apps"; each user list is one more page.
+ * Basket Launcher: pages in the app drawer. Page 0 is "All apps"; each user list is one more page.
  * - Swipe left/right anywhere in the drawer to change page (wraps around).
  * - The page name sits above the search box, with ‹ › arrows on its right and dots for the position;
  *   long press the name to manage lists.
@@ -80,7 +80,7 @@ class ListPager(
 
     private fun currentList(): AppList? = lists.getOrNull(page - 1)
 
-    private fun pageName(): String = currentList()?.name ?: context.getString(R.string.cesta_all_apps)
+    private fun pageName(): String = currentList()?.name ?: context.getString(R.string.basket_all_apps)
 
     private fun reload(keepListId: String? = currentList()?.id) {
         lists = store.all()
@@ -96,7 +96,7 @@ class ListPager(
         binding.recyclerView.scrollToPosition(0)
         render()
         onPageChanged()
-        if (currentList()?.apps?.isEmpty() == true) context.showToast(R.string.cesta_list_empty)
+        if (currentList()?.apps?.isEmpty() == true) context.showToast(R.string.basket_list_empty)
     }
 
     private fun render() {
@@ -132,7 +132,7 @@ class ListPager(
                 minHeight = 40.dpToPx()
                 includeFontPadding = false
                 setBackgroundResource(selectable)
-                contentDescription = context.getString(if (arrow === previous) R.string.cesta_previous_list else R.string.cesta_next_list)
+                contentDescription = context.getString(if (arrow === previous) R.string.basket_previous_list else R.string.basket_next_list)
             }
         }
         previous.setOnClickListener { goTo(page - 1) }
@@ -220,7 +220,7 @@ class ListPager(
                 val info = row.findViewById<TextView>(R.id.appInfo) ?: return
                 val action = TextView(context).apply {
                     tag = ROW_ACTION_TAG
-                    text = context.getString(R.string.cesta_lists)
+                    text = context.getString(R.string.basket_lists)
                     setTextColor(info.textColors)
                     typeface = info.typeface
                     setTextSize(TypedValue.COMPLEX_UNIT_PX, info.textSize)
@@ -229,7 +229,7 @@ class ListPager(
                     ellipsize = android.text.TextUtils.TruncateAt.END
                     setPadding(8.dpToPx(), 0, 8.dpToPx(), 0)
                     compoundDrawablePadding = 2.dpToPx()
-                    setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_cesta_list, 0, 0)
+                    setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_basket_list, 0, 0)
                     setOnClickListener {
                         val model = itemAt(binding.recyclerView.getChildAdapterPosition(view)) ?: return@setOnClickListener
                         row.findViewById<View>(R.id.appMenuClose)?.performClick()
@@ -254,15 +254,15 @@ class ListPager(
     private fun showListsFor(app: ListApp) {
         val current = store.all()
         val labels = current.map { (if (AppListCodec.contains(current, it.id, app)) "✓  " else "+  ") + it.name } +
-            context.getString(R.string.cesta_new_list)
+            context.getString(R.string.basket_new_list)
         showChoiceDialog(app.label, labels) { index ->
             if (index < current.size) {
                 val list = current[index]
                 store.update { AppListCodec.toggle(it, list.id, app) }
                 reload()
-                if (lists.none { it.id == list.id }) context.showToast(context.getString(R.string.cesta_list_deleted, list.name))
+                if (lists.none { it.id == list.id }) context.showToast(context.getString(R.string.basket_list_deleted, list.name))
                 showListsFor(app)
-            } else askName(context.getString(R.string.cesta_list_default_name)) { name ->
+            } else askName(context.getString(R.string.basket_list_default_name)) { name ->
                 store.update { AppListCodec.create(it, name, app) }
                 reload()
                 showListsFor(app)
@@ -273,33 +273,33 @@ class ListPager(
     private fun showManageDialog() {
         val list = currentList()
         val options = mutableListOf<Pair<Int, () -> Unit>>()
-        options += R.string.cesta_new_list to {
-            askName(context.getString(R.string.cesta_list_default_name)) { name ->
+        options += R.string.basket_new_list to {
+            askName(context.getString(R.string.basket_list_default_name)) { name ->
                 store.update { AppListCodec.create(it, name) }
                 lists = store.all()
                 goTo(lists.size)
             }
         }
         if (list != null) {
-            options += R.string.cesta_rename_list to {
+            options += R.string.basket_rename_list to {
                 askName(list.name) { name ->
                     store.update { AppListCodec.rename(it, list.id, name) }
                     reload(list.id)
                 }
             }
-            if (page > 1) options += R.string.cesta_move_left to {
+            if (page > 1) options += R.string.basket_move_left to {
                 store.update { AppListCodec.move(it, list.id, -1) }
                 reload(list.id)
             }
-            if (page < lists.size) options += R.string.cesta_move_right to {
+            if (page < lists.size) options += R.string.basket_move_right to {
                 store.update { AppListCodec.move(it, list.id, 1) }
                 reload(list.id)
             }
-            options += R.string.cesta_delete_list to {
+            options += R.string.basket_delete_list to {
                 context.createDialog(
-                    title = R.string.cesta_delete_list,
-                    action = R.string.cesta_delete,
-                    message = R.string.cesta_delete_list_message,
+                    title = R.string.basket_delete_list,
+                    action = R.string.basket_delete,
+                    message = R.string.basket_delete_list_message,
                     onAction = {
                         store.update { AppListCodec.delete(it, list.id) }
                         reload(null)
@@ -329,8 +329,8 @@ class ListPager(
                 .apply { topMargin = 16.dpToPx(); marginEnd = 8.dpToPx() }
         }
         context.createDialog(
-            title = R.string.cesta_list_name,
-            action = R.string.cesta_save,
+            title = R.string.basket_list_name,
+            action = R.string.basket_save,
             onAction = {
                 val name = input.text.toString().trim()
                 if (name.isNotEmpty()) onName(name)
@@ -376,8 +376,8 @@ class ListPager(
 
     companion object {
         /** Navigation argument: +1 opens the drawer on the next list, -1 on the previous one, 0 on All apps. */
-        const val ARG_STEP = "cesta_list_step"
-        private const val ROW_ACTION_TAG = "cesta_lists_action"
+        const val ARG_STEP = "basket_list_step"
+        private const val ROW_ACTION_TAG = "basket_lists_action"
         private const val SWIPE_MIN_DISTANCE_DP = 64
         private const val SWIPE_MIN_VELOCITY = 300f
     }

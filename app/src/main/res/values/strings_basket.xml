@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Basket Launcher: app list strings -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="basket_all_apps">All apps</string>
+    <string name="basket_lists">Lists</string>
+    <string name="basket_new_list">New list</string>
+    <string name="basket_rename_list">Rename list</string>
+    <string name="basket_move_left">Move left</string>
+    <string name="basket_move_right">Move right</string>
+    <string name="basket_delete_list">Delete list</string>
+    <string name="basket_delete_list_message">The list will be deleted. The apps stay installed.</string>
+    <string name="basket_delete">Delete</string>
+    <string name="basket_save">Save</string>
+    <string name="basket_list_name">List name</string>
+    <string name="basket_list_default_name">List</string>
+    <string name="basket_list_empty">Empty list. In All apps, long press an app → Lists to add it.</string>
+    <string name="basket_previous_list">Previous list</string>
+    <string name="basket_next_list">Next list</string>
+    <string name="basket_list_deleted">List "%1$s" deleted: it has no apps left</string>
+    <!-- Settings backup -->
+    <string name="basket_backup">Backup</string>
+    <string name="basket_backup_export">Export settings</string>
+    <string name="basket_backup_import">Import settings</string>
+    <string name="basket_backup_note">Settings, home apps, custom app names and lists. Hidden apps are not included.</string>
+    <string name="basket_backup_import_title">Import settings?</string>
+    <string name="basket_backup_import_message">Settings and home apps from the file replace the current ones. Lists from the file are added to yours; nothing is deleted. Apps not installed on this device are skipped.</string>
+    <string name="basket_backup_import_action">Import</string>
+    <string name="basket_backup_exported">Settings exported</string>
+    <string name="basket_backup_export_failed">Could not export settings</string>
+    <string name="basket_backup_imported">Imported %1$d settings and %2$d lists</string>
+    <string name="basket_backup_imported_skipped">Imported %1$d settings and %2$d lists. %3$d apps not installed were skipped.</string>
+    <string name="basket_backup_no_picker">No file manager available to pick the file</string>
+    <string name="basket_backup_importing">Importing…</string>
+    <string name="basket_backup_import_failed">Could not import: %1$s</string>
+</resources>

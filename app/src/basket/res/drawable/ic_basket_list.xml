@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cesta: "Lists" action in the drawer's long-press row (same size and tint as upstream row icons). -->
+<!-- Basket: "Lists" action in the drawer's long-press row (same size and tint as upstream row icons). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="22dp"
     android:height="22dp"

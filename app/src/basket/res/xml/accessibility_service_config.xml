@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cesta: same as upstream but listening to this fork's package names (upstream lists app.olauncher only,
+<!-- Basket: same as upstream but listening to this fork's package names (upstream lists app.olauncher only,
      which would silently break double tap to lock). -->
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:accessibilityEventTypes="typeViewClicked"

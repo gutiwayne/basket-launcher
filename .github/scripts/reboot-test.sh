@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Cesta: create app lists, reboot the emulator and check they are still there;
+# Basket: create app lists, reboot the emulator and check they are still there;
 # then export/import settings and check that uninstalling an app cleans the lists.
 # Real device: TABLET=1 APP=… TEST=… ANDROID_SERIAL=… .github/scripts/reboot-test.sh
-# (skips the reboot steps; the APKs come from the CI artifact cesta-device-test-apks).
+# (skips the reboot steps; the APKs come from the CI artifact basket-device-test-apks).
 set -euo pipefail
 APP=${APP:-app/build/outputs/apk/debug/app-debug.apk}
 TEST=${TEST:-app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk}
@@ -71,7 +71,7 @@ run_test verifyUninstalledListDeleted "$BACKUP"
 echo "Backup and list cleanup OK"
 
 echo "== 6. Backup through the real UI and the system file picker"
-# Cesta as the default home, as on a real phone. With two home apps and no default, Pixel Launcher
+# Basket as the default home, as on a real phone. With two home apps and no default, Pixel Launcher
 # relaunches itself and covers the file picker (seen in CI: isDefaultHomeNull=true).
 PKG=io.github.jesusg703.cesta.debug
 HOME_ACTIVITY=$(adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME "$PKG" | tr -d '\r' | tail -1)
@@ -81,11 +81,11 @@ for attempt in 1 2 3 4 5; do
   { adb shell cmd role get-role-holders android.app.role.HOME 2>/dev/null; adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME; } | tr -d '\r' | grep -q "$PKG" && break
   echo "home role not set yet (attempt $attempt)"; sleep 3
 done
-home_is_cesta() {
+home_is_basket() {
   adb shell cmd role get-role-holders android.app.role.HOME 2>/dev/null | tr -d '\r' | grep -q "$PKG" \
     || adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME | tr -d '\r' | tail -1 | grep -q "$PKG"
 }
-home_is_cesta || { echo "::error::could not make Cesta the home app"; exit 1; }
+home_is_basket || { echo "::error::could not make Basket the home app"; exit 1; }
 adb shell input keyevent KEYCODE_HOME
 sleep 3
 ui_status=0

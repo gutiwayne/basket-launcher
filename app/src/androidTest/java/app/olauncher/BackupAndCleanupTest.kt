@@ -15,7 +15,7 @@ import org.junit.runner.RunWith
 import java.io.File
 
 /**
- * Cesta: on a real Android runtime (its own regex and org.json), with real installed apps.
+ * Basket: on a real Android runtime (its own regex and org.json), with real installed apps.
  * - exportImportKeepsListApps: export → clear lists → import gives the same lists back.
  * - writeListWithTestPackage / verifyUninstalledListDeleted: CI uninstalls this test APK in between
  *   (see .github/scripts/reboot-test.sh); the list holding only that package must be gone.

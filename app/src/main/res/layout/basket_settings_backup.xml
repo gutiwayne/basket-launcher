@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cesta Launcher: Backup section, inserted into the settings screen by ui/BackupSection.kt. -->
+<!-- Basket Launcher: Backup section, inserted into the settings screen by ui/BackupSection.kt. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,29 +17,29 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp"
-        android:text="@string/cesta_backup"
+        android:text="@string/basket_backup"
         android:textColor="?attr/primaryColor" />
 
     <TextView
-        android:id="@+id/cestaBackupExport"
+        android:id="@+id/basketBackupExport"
         style="@style/TextSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="12dp"
         android:paddingVertical="8dp"
-        android:text="@string/cesta_backup_export"
+        android:text="@string/basket_backup_export"
         android:textColor="?attr/primaryColor" />
 
     <TextView
-        android:id="@+id/cestaBackupImport"
+        android:id="@+id/basketBackupImport"
         style="@style/TextSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="12dp"
         android:paddingVertical="8dp"
-        android:text="@string/cesta_backup_import"
+        android:text="@string/basket_backup_import"
         android:textColor="?attr/primaryColor" />
 
     <TextView
@@ -49,6 +49,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:alpha="0.6"
-        android:text="@string/cesta_backup_note"
+        android:text="@string/basket_backup_note"
         android:textColor="?attr/primaryColor" />
 </LinearLayout>

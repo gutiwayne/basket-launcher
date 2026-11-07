@@ -62,7 +62,7 @@
     <string name="digital_wellbeing_message">Si deseas establecer límites de tiempo para determinadas aplicaciones, la función Bienestar digital de Android puede ayudarte a hacerlo. Busca Bienestar digital en la configuración de tu teléfono y actívalo.</string>
     <string name="app_usage_message">Para mostrar/ocultar el tiempo de pantalla en la pantalla de inicio, permita o deniegue el permiso de uso de la aplicación.
         \n\nNota: No se recopilan datos de uso de la aplicación. Todo se procesa en su dispositivo.</string>
-    <string name="pro_message">Olauncher también tiene una versión pro llamada Pro Launcher. Tiene funciones adicionales como clima, widgets, fuentes, carpetas, fondos AMOLED, etc.
+    <string name="pro_message">Olauncher también tiene una versión pro llamada Pro Launcher. Tiene funciones adicionales como clima, widgets, fuentes, basket, fondos AMOLED, etc.
         \n\nTambién es la mejor manera de apoyar a los desarrolladores de Olauncher. ¡Échale un vistazo!</string>
     <string name="wallpaper_message">Olauncher ofrece hermosos fondos de pantalla nuevos a diario. ¡Dale un nuevo look a tu pantalla de inicio cada día, gratis!
         \n\n¿Quieres probarlo?</string>

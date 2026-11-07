@@ -63,7 +63,7 @@
         \n\nBusque Bienestar Digital en la configuración de su teléfono y habilítelo.</string>
     <string name="app_usage_message">Para mostrar/ocultar el tiempo de pantalla en la pantalla de inicio, permita o deniegue el permiso de uso de la aplicación.
         \n\nNota: No se recopilan datos de uso de la aplicación. Todo se procesa en su dispositivo.</string>
-    <string name="pro_message">Olauncher también tiene una versión pro llamada Pro Launcher. Tiene funciones adicionales como clima, widgets, fuentes, carpetas, fondos AMOLED, etc.\n\nTambién es la mejor manera de apoyar a los desarrolladores de Olauncher. ¡Échele un vistazo!</string>
+    <string name="pro_message">Olauncher también tiene una versión pro llamada Pro Launcher. Tiene funciones adicionales como clima, widgets, fuentes, basket, fondos AMOLED, etc.\n\nTambién es la mejor manera de apoyar a los desarrolladores de Olauncher. ¡Échele un vistazo!</string>
     <string name="wallpaper_message">Olauncher ofrece hermosos fondos de pantalla nuevos a diario. Dele un nuevo look a su pantalla de inicio cada día, ¡gratis!\n\n¿Quiere probarlo?</string>
     <string name="accessibility_service_description">El permiso de accesibilidad es necesario para habilitar el gesto de doble toque para bloquear. Ningún dato obtenido por Olauncher a través de este servicio saldrá de su dispositivo.</string>
     <string name="support_olauncher_for_free">Apoye Olauncher de forma gratuita utilizando nuestro enlace de afiliado de Amazon.</string>

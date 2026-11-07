@@ -443,7 +443,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         return false
     }
 
-    // Cesta: right after a reboot, or with the work profile / private space locked, Android may not return
+    // Basket: right after a reboot, or with the work profile / private space locked, Android may not return
     // the app yet. Upstream wiped the slot for good; now it is only cleared when the check is reliable.
     private fun onHomeAppMissing(textView: TextView, appName: String, userString: String, forget: () -> Unit) {
         if (isAppCheckReliable(requireContext(), userString)) forget()
@@ -533,7 +533,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun openSwipeRightApp() {
-        if (openListPage(-1)) return // Cesta: side swipes move between app lists
+        if (openListPage(-1)) return // Basket: side swipes move between app lists
         if (!prefs.swipeRightEnabled) return
         launchAppOrShortcut(
             appName = prefs.appNameSwipeRight,
@@ -547,7 +547,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun openSwipeLeftApp() {
-        if (openListPage(1)) return // Cesta
+        if (openListPage(1)) return // Basket
         if (!prefs.swipeLeftEnabled) return
         launchAppOrShortcut(
             appName = prefs.appNameSwipeLeft,
@@ -560,7 +560,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         )
     }
 
-    // Cesta: open the drawer on the next (+1) or previous (-1) app list instead of camera/dialer
+    // Basket: open the drawer on the next (+1) or previous (-1) app list instead of camera/dialer
     private fun openListPage(step: Int): Boolean {
         viewModel.getAppList()
         val args = bundleOf(Constants.Key.FLAG to Constants.FLAG_LAUNCH_APP, ListPager.ARG_STEP to step)

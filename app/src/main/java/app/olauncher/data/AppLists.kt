@@ -8,7 +8,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.UUID
 
-// Cesta Launcher: app lists. The drawer shows "All apps" plus one page per list; swiping left/right
+// Basket Launcher: app lists. The drawer shows "All apps" plus one page per list; swiping left/right
 // moves between them. Stored as JSON in the launcher's own SharedPreferences (private app storage,
 // survives reboots).
 
@@ -61,7 +61,7 @@ object AppListCodec {
         }
     }
 
-    /** Home screen folders from earlier Cesta builds ({"v":1,"folders":[…]}) become lists, ordered by slot. */
+    /** Home screen folders from earlier Basket builds ({"v":1,"folders":[…]}) become lists, ordered by slot. */
     fun fromLegacyFolders(json: String?): List<AppList> {
         if (json.isNullOrBlank()) return emptyList()
         val array = JSONObject(json).optJSONArray("folders") ?: return emptyList()

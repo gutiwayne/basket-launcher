@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [carpetas]
+    branches: [basket]
   pull_request:
   workflow_dispatch:
 
@@ -39,7 +39,7 @@ jobs:
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: cesta-debug-apk
+          name: basket-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 14
 
@@ -47,7 +47,7 @@ jobs:
       # to run .github/scripts/reboot-test.sh there (TABLET=1).
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: cesta-device-test-apks
+          name: basket-device-test-apks
           path: |
             app/build/outputs/apk/debug/*.apk
             app/build/outputs/apk/androidTest/debug/*.apk

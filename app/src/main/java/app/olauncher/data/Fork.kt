@@ -1,6 +1,6 @@
 package app.olauncher.data
 
-// Cesta Launcher: fork-specific switches kept apart from upstream code.
+// Basket Launcher: fork-specific switches kept apart from upstream code.
 object Fork {
     /** Upstream prompts that point to the Olauncher Play Store listing or promote other apps. */
     val DISABLED_DIALOGS = setOf(
