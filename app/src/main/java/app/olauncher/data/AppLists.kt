@@ -114,12 +114,26 @@ object AppListCodec {
     fun contains(lists: List<AppList>, id: String, app: ListApp) =
         lists.firstOrNull { it.id == id }?.apps?.any { it.sameAppAs(app) } == true
 
-    /** Adds [app] to the list, or removes it if it is already there. */
-    fun toggle(lists: List<AppList>, id: String, app: ListApp) = lists.map { list ->
+    /**
+     * Adds [app] to the list, or removes it if it is already there.
+     * Removing the last app deletes the list; a list created empty stays until it gets its first app.
+     */
+    fun toggle(lists: List<AppList>, id: String, app: ListApp) = lists.mapNotNull { list ->
         when {
             list.id != id -> list
-            list.apps.any { it.sameAppAs(app) } -> list.copy(apps = list.apps.filterNot { it.sameAppAs(app) })
+            list.apps.any { it.sameAppAs(app) } ->
+                list.copy(apps = list.apps.filterNot { it.sameAppAs(app) }).takeIf { it.apps.isNotEmpty() }
             else -> list.copy(apps = list.apps + app)
+        }
+    }
+
+    /** An uninstalled app (and its shortcuts) leaves every list; lists left without apps are deleted. */
+    fun removePackage(lists: List<AppList>, appPackage: String, user: String) = lists.mapNotNull { list ->
+        val kept = list.apps.filterNot { it.appPackage == appPackage && it.user == user }
+        when {
+            kept.size == list.apps.size -> list
+            kept.isEmpty() -> null
+            else -> list.copy(apps = kept)
         }
     }
 }
@@ -141,6 +155,12 @@ class AppListStore(context: Context) {
 
     fun update(change: (List<AppList>) -> List<AppList>): Boolean =
         prefs.edit().putString(KEY, AppListCodec.encode(change(all()))).commit()
+
+    fun removePackage(appPackage: String, user: String) {
+        val before = all()
+        val after = AppListCodec.removePackage(before, appPackage, user)
+        if (after != before) prefs.edit().putString(KEY, AppListCodec.encode(after)).commit()
+    }
 
     private fun migrateLegacyFolders() {
         val legacy = prefs.getString(KEY_LEGACY_FOLDERS, null) ?: return

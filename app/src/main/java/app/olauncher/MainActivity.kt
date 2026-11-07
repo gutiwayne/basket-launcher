@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import app.olauncher.data.AppListStore
 import app.olauncher.data.Constants
 import app.olauncher.data.Fork
 import app.olauncher.data.Prefs
@@ -141,7 +142,8 @@ class MainActivity : AppCompatActivity() {
     private fun registerShortcutCallback() {
         val launcherApps = getSystemService(LauncherApps::class.java)
         launcherAppsCallback = object : LauncherApps.Callback() {
-            override fun onPackageRemoved(packageName: String, user: android.os.UserHandle) = Unit
+            override fun onPackageRemoved(packageName: String, user: android.os.UserHandle) =
+                AppListStore(this@MainActivity).removePackage(packageName, user.toString()) // Cesta
             override fun onPackageAdded(packageName: String, user: android.os.UserHandle) = Unit
             override fun onPackageChanged(packageName: String, user: android.os.UserHandle) = Unit
             override fun onPackagesAvailable(

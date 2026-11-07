@@ -16,6 +16,7 @@
     <string name="cesta_list_empty">Empty list. In All apps, long press an app → Lists to add it.</string>
     <string name="cesta_previous_list">Previous list</string>
     <string name="cesta_next_list">Next list</string>
+    <string name="cesta_list_deleted">List "%1$s" deleted: it has no apps left</string>
     <!-- Settings backup -->
     <string name="cesta_backup">Backup</string>
     <string name="cesta_backup_export">Export settings</string>

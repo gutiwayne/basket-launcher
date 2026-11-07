@@ -76,6 +76,18 @@
             </intent-filter>
         </activity>
 
+        <!-- Cesta: removes uninstalled apps from app lists even when the launcher is not running.
+             Exported so the system can deliver it; PACKAGE_FULLY_REMOVED is a protected broadcast that
+             other apps cannot send. -->
+        <receiver
+            android:name=".listener.PackageRemovedReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
         <receiver
             android:name=".listener.DeviceAdmin"
             android:exported="false"
