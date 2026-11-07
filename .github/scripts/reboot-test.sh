@@ -45,6 +45,10 @@ run_test exportImportKeepsListApps "$BACKUP"
 
 echo "== 5. Uninstalling an app deletes the lists left without apps"
 run_test writeListWithTestPackage "$BACKUP"
+# Instrumentation leaves the app force-stopped, and stopped apps get no system broadcasts.
+# A launcher is always running on a real phone, so start it before uninstalling.
+adb shell am start -W -n io.github.jesusg703.cesta.debug/app.olauncher.MainActivity >/dev/null
+sleep 3
 adb uninstall io.github.jesusg703.cesta.debug.test
 sleep 5
 adb install -r "$TEST"

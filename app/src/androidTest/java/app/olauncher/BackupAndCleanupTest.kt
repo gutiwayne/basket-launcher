@@ -74,7 +74,10 @@ class BackupAndCleanupTest {
 
     @Test
     fun verifyUninstalledListDeleted() {
-        val lists = AppListStore(context).all()
+        val store = AppListStore(context)
+        val deadline = System.currentTimeMillis() + 10_000
+        while (store.all().any { it.id == "uninstall-only" } && System.currentTimeMillis() < deadline) Thread.sleep(250)
+        val lists = store.all()
         assertEquals(listOf("uninstall-mixed", "uninstall-empty"), lists.map { it.id })
         assertEquals(listOf("com.android.settings"), lists[0].apps.map { it.appPackage })
     }
