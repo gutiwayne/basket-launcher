@@ -1,5 +1,6 @@
 package app.olauncher.ui
 
+import android.content.ActivityNotFoundException
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -33,9 +34,11 @@ import java.util.Locale
 class BackupSection(private val fragment: Fragment) {
 
     private val exportLauncher = fragment.registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        pickerOpen = false
         uri?.let(::export)
     }
     private val importLauncher = fragment.registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        pickerOpen = false
         uri?.let(::confirmImport)
     }
 
@@ -47,10 +50,20 @@ class BackupSection(private val fragment: Fragment) {
         container.addView(section.root, container.indexOfChild(links))
         section.cestaBackupExport.setOnClickListener {
             val date = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(Date())
-            exportLauncher.launch("cesta-launcher-$date.json")
+            openPicker { exportLauncher.launch("cesta-launcher-$date.json") }
         }
         section.cestaBackupImport.setOnClickListener {
-            importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
+            openPicker { importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }
+        }
+    }
+
+    private fun openPicker(launch: () -> Unit) {
+        pickerOpen = true
+        try {
+            launch()
+        } catch (e: ActivityNotFoundException) {
+            pickerOpen = false
+            fragment.context?.showToast(R.string.cesta_backup_no_picker)
         }
     }
 
@@ -132,7 +145,14 @@ class BackupSection(private val fragment: Fragment) {
         return dialog
     }
 
-    private companion object {
-        const val MIN_PROGRESS_MS = 600L
+    companion object {
+        private const val MIN_PROGRESS_MS = 600L
+
+        /**
+         * True while the system file picker is in front. The launcher normally goes back to the home screen
+         * when it stops (MainActivity.backToHomeScreen), which would destroy Settings and drop the picked file.
+         */
+        @Volatile
+        var pickerOpen = false
     }
 }

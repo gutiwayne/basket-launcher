@@ -115,4 +115,6 @@ dependencies {
     // Emulator reboot test (CI)
     androidTestImplementation "androidx.test:runner:1.7.0"
     androidTestImplementation "androidx.test.ext:junit:1.3.0"
+    // Settings → Backup UI test through the system file picker (CI emulator)
+    androidTestImplementation "androidx.test.uiautomator:uiautomator:2.3.0"
 }

@@ -50,3 +50,11 @@ sleep 5
 adb install -r "$TEST"
 run_test verifyUninstalledListDeleted "$BACKUP"
 echo "Backup and list cleanup OK"
+
+echo "== 6. Backup through the real UI and the system file picker"
+ui_status=0
+( run_test exportThenImportThroughSystemPicker app.olauncher.BackupUiTest ) || ui_status=$?
+mkdir -p ui-test
+adb pull /sdcard/Android/data/io.github.jesusg703.cesta.debug/files/ui-test/. ui-test/ || true
+ls ui-test
+exit "$ui_status"
