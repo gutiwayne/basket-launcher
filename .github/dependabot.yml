@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Gradle dependencies and plugins (app/build.gradle, gradle/libs.versions.toml).
+  # Minor and patch bumps come in one grouped PR; major bumps get their own PR.
+  - package-ecosystem: gradle
+    directory: /
+    target-branch: basket
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      gradle-minor-and-patch:
+        update-types: [minor, patch]
+
+  # Actions used by the CI, release and upstream-sync workflows.
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: basket
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]
