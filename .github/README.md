@@ -6,8 +6,7 @@ Basket Launcher is a fork of [Olauncher](https://github.com/tanujnotes/Olauncher
 [tanujnotes](https://github.com/tanujnotes). All the credit for the launcher itself goes to
 the original author; this fork only adds a few things on top and follows upstream weekly.
 
-It was called *Cesta Launcher* before; the app id is still `io.github.jesusg703.cesta`, so existing
-installs update in place and keep their lists and settings.
+It was called *Cesta Launcher* before.
 
 ## What is different from Olauncher
 
@@ -19,7 +18,7 @@ installs update in place and keep their lists and settings.
 - **Home apps survive reboots.** Right after boot, or while the work profile or private space is
   locked, Android may briefly report apps as missing. Olauncher then cleared that home slot for
   good; Basket only clears it when the app was really uninstalled.
-- Its own app id (`io.github.jesusg703.cesta`), so it installs next to Olauncher.
+- Its own app id (`io.github.gutiwayne.basket`), so it installs next to Olauncher.
 - No rating, sharing or "Pro" prompts, English only.
 
 Everything else (gestures, hidden apps, screen time, daily wallpapers…) is Olauncher.

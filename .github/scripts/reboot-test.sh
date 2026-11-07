@@ -7,7 +7,7 @@ set -euo pipefail
 APP=${APP:-app/build/outputs/apk/debug/app-debug.apk}
 TEST=${TEST:-app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk}
 TABLET=${TABLET:-0}
-RUNNER=io.github.jesusg703.cesta.debug.test/androidx.test.runner.AndroidJUnitRunner
+RUNNER=io.github.gutiwayne.basket.debug.test/androidx.test.runner.AndroidJUnitRunner
 CLASS=app.olauncher.ListPersistenceTest
 BACKUP=app.olauncher.BackupAndCleanupTest
 
@@ -29,8 +29,8 @@ wait_boot() {
 
 if [ "$TABLET" = 1 ]; then
   # Each CI run signs debug builds with a new key: replace, do not update.
-  adb uninstall io.github.jesusg703.cesta.debug >/dev/null 2>&1 || true
-  adb uninstall io.github.jesusg703.cesta.debug.test >/dev/null 2>&1 || true
+  adb uninstall io.github.gutiwayne.basket.debug >/dev/null 2>&1 || true
+  adb uninstall io.github.gutiwayne.basket.debug.test >/dev/null 2>&1 || true
   adb shell input keyevent KEYCODE_WAKEUP || true
 fi
 adb install -r "$APP"
@@ -58,14 +58,14 @@ echo "== 5. Uninstalling an app deletes the lists left without apps"
 run_test writeListWithTestPackage "$BACKUP"
 # Instrumentation leaves the app force-stopped, and stopped apps get no system broadcasts.
 # A launcher is always running on a real phone, so start it before uninstalling.
-adb shell am start -W -n io.github.jesusg703.cesta.debug/app.olauncher.MainActivity >/dev/null
+adb shell am start -W -n io.github.gutiwayne.basket.debug/app.olauncher.MainActivity >/dev/null
 sleep 3
-adb uninstall io.github.jesusg703.cesta.debug.test
+adb uninstall io.github.gutiwayne.basket.debug.test
 sleep 5
 adb install -r "$TEST"
 # Instrumentation force-stops the app, so the broadcast may be missed; the launcher then cleans up
 # when it comes to the foreground (MainActivity.onResume), as it would on a phone.
-adb shell am start -W -n io.github.jesusg703.cesta.debug/app.olauncher.MainActivity >/dev/null
+adb shell am start -W -n io.github.gutiwayne.basket.debug/app.olauncher.MainActivity >/dev/null
 sleep 2
 run_test verifyUninstalledListDeleted "$BACKUP"
 echo "Backup and list cleanup OK"
@@ -73,7 +73,7 @@ echo "Backup and list cleanup OK"
 echo "== 6. Backup through the real UI and the system file picker"
 # Basket as the default home, as on a real phone. With two home apps and no default, Pixel Launcher
 # relaunches itself and covers the file picker (seen in CI: isDefaultHomeNull=true).
-PKG=io.github.jesusg703.cesta.debug
+PKG=io.github.gutiwayne.basket.debug
 HOME_ACTIVITY=$(adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME "$PKG" | tr -d '\r' | tail -1)
 for attempt in 1 2 3 4 5; do
   adb shell cmd role add-role-holder android.app.role.HOME "$PKG" 0 2>/dev/null \
@@ -94,6 +94,6 @@ adb logcat -c
 mkdir -p ui-test
 adb logcat -d > ui-test/logcat.txt || true
 adb shell dumpsys activity activities > ui-test/activities.txt || true
-adb pull /sdcard/Android/data/io.github.jesusg703.cesta.debug/files/ui-test/. ui-test/ || true
+adb pull /sdcard/Android/data/io.github.gutiwayne.basket.debug/files/ui-test/. ui-test/ || true
 ls ui-test
 exit "$ui_status"
