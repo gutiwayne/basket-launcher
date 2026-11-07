@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cesta: Android 11 and older. Settings are only included in device-to-device transfers (Android 9+),
+     never in the cloud backup. See data_extraction_rules.xml for Android 12+. -->
+<full-backup-content>
+    <include domain="sharedpref" path="app.olauncher.xml" requireFlags="deviceToDeviceTransfer" />
+</full-backup-content>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cesta: launcher settings (including hidden apps) are not uploaded to the cloud backup; they are only
+     copied in a direct device-to-device transfer. Use Settings → Backup to move them through a file. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="app.olauncher.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="app.olauncher.xml" />
+    </device-transfer>
+</data-extraction-rules>
