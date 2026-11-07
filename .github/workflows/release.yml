@@ -65,7 +65,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cat > notes.md <<NOTES
-          **Cesta Launcher**: a fork of [Olauncher](https://github.com/tanujnotes/Olauncher) by tanujnotes (GPL-3.0) with home screen folders.
+          **Cesta Launcher**: a fork of [Olauncher](https://github.com/tanujnotes/Olauncher) by tanujnotes (GPL-3.0) with swipeable app lists and settings backup.
 
           - Signing certificate SHA-256 fingerprint: \`${{ steps.apk.outputs.cert }}\`
           - Verify the APK with \`${{ steps.apk.outputs.file }}.sha256\`.
