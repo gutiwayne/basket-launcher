@@ -10,7 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Cesta: checks that app lists survive a system reboot, including the migration of old home folders.
+ * Basket: checks that app lists survive a system reboot, including the migration of old home folders.
  * CI runs writeLists, reboots the emulator (adb reboot), then runs verifyListsAfterReboot.
  * See .github/scripts/reboot-test.sh.
  */
@@ -28,7 +28,7 @@ class ListPersistenceTest {
     @Test
     fun writeLists() {
         val prefs = context.getSharedPreferences("app.olauncher", 0)
-        // An old home folder written by an earlier Cesta build, to be migrated on first read.
+        // An old home folder written by an earlier Basket build, to be migrated on first read.
         prefs.edit().remove("CESTA_LISTS").putString(
             "CESTA_FOLDERS",
             "{\"v\":1,\"folders\":[{\"id\":\"legacy\",\"slot\":3,\"name\":\"Old folder\",\"apps\":" +

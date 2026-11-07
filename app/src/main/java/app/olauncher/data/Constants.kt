@@ -90,11 +90,11 @@ object Constants {
 
     const val MIN_ANIM_REFRESH_RATE = 30f
 
-    const val URL_ABOUT_OLAUNCHER = "https://github.com/jesusg703/Olauncher#readme" // Cesta: fork README (credits upstream)
-    const val URL_OLAUNCHER_PRIVACY = "https://github.com/jesusg703/Olauncher#privacy" // Cesta
+    const val URL_ABOUT_OLAUNCHER = "https://github.com/jesusg703/basket-launcher#readme" // Basket: fork README (credits upstream)
+    const val URL_OLAUNCHER_PRIVACY = "https://github.com/jesusg703/basket-launcher#privacy" // Basket
     const val URL_DOUBLE_TAP = "https://tanujnotes.notion.site/Double-tap-to-lock-Olauncher-0f7fb103ec1f47d7a90cdfdcd7fb86ef"
-    const val URL_OLAUNCHER_GITHUB = "https://github.com/jesusg703/Olauncher" // Cesta
-    const val URL_OLAUNCHER_PLAY_STORE = "https://github.com/jesusg703/Olauncher/releases/latest" // Cesta: used by share
+    const val URL_OLAUNCHER_GITHUB = "https://github.com/jesusg703/basket-launcher" // Basket
+    const val URL_OLAUNCHER_PLAY_STORE = "https://github.com/jesusg703/basket-launcher/releases/latest" // Basket: used by share
     const val URL_OLAUNCHER_PRO = "https://play.google.com/store/apps/details?id=app.prolauncher"
     const val URL_PLAY_STORE_DEV = "https://play.google.com/store/apps/dev?id=7198807840081074933"
     const val URL_TWITTER_TANUJ = "https://x.com/tanujnotes"

@@ -211,7 +211,7 @@ fun isPackageInstalled(context: Context, packageName: String, userString: String
 }
 
 /**
- * Cesta: whether "app not found" really means the app was uninstalled.
+ * Basket: whether "app not found" really means the app was uninstalled.
  * False if that user's profile is unavailable, still locked (right after boot)
  * or in quiet mode (paused work profile, locked private space).
  */

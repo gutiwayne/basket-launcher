@@ -76,7 +76,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Cesta: removes uninstalled apps from app lists even when the launcher is not running.
+        <!-- Basket: removes uninstalled apps from app lists even when the launcher is not running.
              Exported so the system can deliver it; PACKAGE_FULLY_REMOVED is a protected broadcast that
              other apps cannot send. -->
         <receiver

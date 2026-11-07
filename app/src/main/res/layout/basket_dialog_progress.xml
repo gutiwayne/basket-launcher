@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cesta Launcher: non-cancellable "working" dialog (used while importing settings). -->
+<!-- Basket Launcher: non-cancellable "working" dialog (used while importing settings). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,7 +15,7 @@
         android:indeterminateTint="?attr/primaryColor" />
 
     <TextView
-        android:id="@+id/cestaProgressText"
+        android:id="@+id/basketProgressText"
         style="@style/TextLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

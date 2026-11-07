@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         isResumed = true
         viewModel.isPrivateSpaceToggling = false
-        AppListStore(this).removeUninstalled(this) // Cesta: uninstalls missed while stopped
+        AppListStore(this).removeUninstalled(this) // Basket: uninstalls missed while stopped
         viewModel.getAppList()
     }
 
@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
         val launcherApps = getSystemService(LauncherApps::class.java)
         launcherAppsCallback = object : LauncherApps.Callback() {
             override fun onPackageRemoved(packageName: String, user: android.os.UserHandle) =
-                AppListStore(this@MainActivity).removePackage(packageName, user.toString()) // Cesta
+                AppListStore(this@MainActivity).removePackage(packageName, user.toString()) // Basket
             override fun onPackageAdded(packageName: String, user: android.os.UserHandle) = Unit
             override fun onPackageChanged(packageName: String, user: android.os.UserHandle) = Unit
             override fun onPackagesAvailable(
@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity() {
             checkForMessages()
         }
         viewModel.showDialog.observe(this) {
-            if (it in Fork.DISABLED_DIALOGS) return@observe // Cesta: no review/rate/share/Pro prompts
+            if (it in Fork.DISABLED_DIALOGS) return@observe // Basket: no review/rate/share/Pro prompts
             when (it) {
                 Constants.Dialog.ABOUT -> {
                     showMessage(R.string.app_name, R.string.welcome_to_olauncher_settings, R.string.okay) {}
@@ -351,7 +351,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun backToHomeScreen() {
         if (viewModel.isPrivateSpaceToggling) return
-        if (BackupSection.pickerOpen) return // Cesta: keep Settings alive while the file picker is open
+        if (BackupSection.pickerOpen) return // Basket: keep Settings alive while the file picker is open
         messageDialog?.dismiss()
         if (navController.currentDestination?.id != R.id.mainFragment)
             navController.popBackStack(R.id.mainFragment, false)

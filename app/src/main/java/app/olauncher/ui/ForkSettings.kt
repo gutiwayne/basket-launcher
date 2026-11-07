@@ -3,7 +3,7 @@ package app.olauncher.ui
 import androidx.core.view.isVisible
 import app.olauncher.databinding.FragmentSettingsBinding
 
-/** Cesta: hide upstream promotions and links that only make sense for Olauncher on the Play Store. */
+/** Basket: hide upstream promotions and links that only make sense for Olauncher on the Play Store. */
 fun FragmentSettingsBinding.hideUpstreamPromos() {
     moreFeatures.isVisible = false // Olauncher Pro ad
     rate.isVisible = false         // Play Store rating

@@ -1,9 +1,9 @@
 name: Release
 
-# Publishes a signed build when a tag is pushed, e.g.: git tag v6.11.5-cesta.1 && git push origin v6.11.5-cesta.1
+# Publishes a signed build when a tag is pushed, e.g.: git tag v6.11.5-basket.1 && git push origin v6.11.5-basket.1
 on:
   push:
-    tags: ["v*-cesta*"]   # upstream tags (v6.11.5…) never publish anything
+    tags: ["v*-basket*"]   # upstream tags (v6.11.5…) never publish anything
   workflow_dispatch:      # manual run: builds and verifies the signed APK, uploads it as an artifact, no release
 
 permissions:
@@ -30,20 +30,20 @@ jobs:
       - name: Build signed release
         env:
           KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
-          CESTA_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          BASKET_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: |
           test -n "$KEYSTORE_BASE64" || { echo "::error::Missing secret SIGNING_KEYSTORE_BASE64"; exit 1; }
-          export CESTA_KEYSTORE="$RUNNER_TEMP/cesta.p12"
-          echo "$KEYSTORE_BASE64" | base64 -d > "$CESTA_KEYSTORE"
+          export BASKET_KEYSTORE="$RUNNER_TEMP/basket.p12"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$BASKET_KEYSTORE"
           ./gradlew --no-daemon assembleRelease
-          rm -f "$CESTA_KEYSTORE"
+          rm -f "$BASKET_KEYSTORE"
 
       - name: Verify signature
         id: apk
         run: |
           APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
           SRC=$(ls app/build/outputs/apk/release/*.apk | head -1)
-          if [ "$GITHUB_REF_TYPE" = "tag" ]; then OUT="cesta-launcher-${GITHUB_REF_NAME}.apk"; else OUT="cesta-launcher-${GITHUB_SHA::7}.apk"; fi
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then OUT="basket-launcher-${GITHUB_REF_NAME}.apk"; else OUT="basket-launcher-${GITHUB_SHA::7}.apk"; fi
           cp "$SRC" "$OUT"
           "$APKSIGNER" verify --print-certs "$OUT" | tee signature.txt
           grep -q "SHA-256 digest" signature.txt
@@ -53,7 +53,7 @@ jobs:
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: cesta-release-apk
+          name: basket-release-apk
           path: |
             ${{ steps.apk.outputs.file }}
             ${{ steps.apk.outputs.file }}.sha256
@@ -65,10 +65,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cat > notes.md <<NOTES
-          **Cesta Launcher**: a fork of [Olauncher](https://github.com/tanujnotes/Olauncher) by tanujnotes (GPL-3.0) with swipeable app lists and settings backup.
+          **Basket Launcher**: a fork of [Olauncher](https://github.com/tanujnotes/Olauncher) by tanujnotes (GPL-3.0) with swipeable app lists and settings backup.
 
           - Signing certificate SHA-256 fingerprint: \`${{ steps.apk.outputs.cert }}\`
           - Verify the APK with \`${{ steps.apk.outputs.file }}.sha256\`.
           NOTES
           gh release create "$GITHUB_REF_NAME" "${{ steps.apk.outputs.file }}" "${{ steps.apk.outputs.file }}.sha256" \
-            --title "Cesta Launcher $GITHUB_REF_NAME" --notes-file notes.md --generate-notes
+            --title "Basket Launcher $GITHUB_REF_NAME" --notes-file notes.md --generate-notes

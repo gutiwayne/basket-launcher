@@ -7,5 +7,5 @@
             <corners android:radius="12dp" />
         </shape>
     </item>
-    <item android:drawable="@drawable/ic_cesta_foreground" />
+    <item android:drawable="@drawable/ic_basket_foreground" />
 </layer-list>

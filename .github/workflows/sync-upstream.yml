@@ -1,8 +1,8 @@
 name: Sync with Olauncher
 
-# Every Monday: master = exact mirror of upstream; the merge into carpetas is tested and offered as a
-# pull request (branch sync/upstream), never pushed to carpetas directly, so upstream code is reviewed first.
-# On conflict or test failure nothing is pushed to carpetas and an issue is opened (GitHub notifies you).
+# Every Monday: master = exact mirror of upstream; the merge into basket is tested and offered as a
+# pull request (branch sync/upstream), never pushed to basket directly, so upstream code is reviewed first.
+# On conflict or test failure nothing is pushed to basket and an issue is opened (GitHub notifies you).
 #
 # Upstream code is only built in the "test" job, which has a read-only token that is not stored on disk.
 # The jobs that can write never run a build.
@@ -30,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: carpetas
+          ref: basket
           fetch-depth: 0
           persist-credentials: false
 
@@ -42,7 +42,7 @@ jobs:
           echo "sha=$(git rev-parse upstream/master)" >> "$GITHUB_OUTPUT"
           echo "new=$(git rev-list --count HEAD..upstream/master)" >> "$GITHUB_OUTPUT"
 
-      - name: Merge into carpetas
+      - name: Merge into basket
         id: merge
         if: steps.fetch.outputs.new != '0'
         run: |
@@ -80,7 +80,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: carpetas
+          ref: basket
           fetch-depth: 0
 
       - name: Update master (fast-forward only)
@@ -89,7 +89,7 @@ jobs:
           git fetch --no-tags upstream master
           git push origin "${{ needs.test.outputs.sha }}:refs/heads/master"
 
-      - name: Open a pull request into carpetas
+      - name: Open a pull request into basket
         if: needs.test.result == 'success' && needs.test.outputs.merged == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -100,15 +100,15 @@ jobs:
           # Same commits as the tested merge; only the merge commit's timestamp differs.
           git merge --no-edit "$SHA" -m "Merge Olauncher upstream (${SHA:0:7})"
           git push --force origin HEAD:refs/heads/sync/upstream
-          compare="${{ github.server_url }}/${{ github.repository }}/compare/carpetas...sync/upstream"
-          if [ -n "$(gh pr list --head sync/upstream --base carpetas --state open --json number --jq '.[].number')" ]; then
+          compare="${{ github.server_url }}/${{ github.repository }}/compare/basket...sync/upstream"
+          if [ -n "$(gh pr list --head sync/upstream --base basket --state open --json number --jq '.[].number')" ]; then
             echo "Pull request already open; branch updated."
             exit 0
           fi
           printf '%s\n\n%s\n' \
             "Weekly merge of Olauncher upstream (${SHA:0:7}). Unit tests, lint and the debug build passed." \
             "Review the upstream changes before merging: $compare" > body.md
-          if ! gh pr create --base carpetas --head sync/upstream --title "Olauncher sync ($(date +%F))" --body-file body.md; then
+          if ! gh pr create --base basket --head sync/upstream --title "Olauncher sync ($(date +%F))" --body-file body.md; then
             echo "::warning::Could not open a pull request (Settings → Actions → General → allow GitHub Actions to create pull requests). Review: $compare"
           fi
 
@@ -137,7 +137,7 @@ jobs:
               echo "- Reason: pushing \`master\` or \`sync/upstream\` failed."
             fi
             echo
-            echo "Nothing was pushed to \`carpetas\`."
+            echo "Nothing was pushed to \`basket\`."
           } > issue.md
           gh issue create --repo "${{ github.repository }}" --title "Olauncher sync: needs review ($(date +%F))" --body-file issue.md \
             || echo "::warning::Could not open an issue (Issues disabled on the fork?). GitHub still emails you about the failed run."

@@ -74,38 +74,38 @@ dependencies {
     testImplementation libs.junit
 }
 
-// --- Cesta Launcher (fork of Olauncher by tanujnotes) ---
+// --- Basket Launcher (fork of Olauncher by tanujnotes) ---
 // Fork-specific changes live in a separate block so upstream merges do not conflict.
 android {
     defaultConfig {
         applicationId "io.github.jesusg703.cesta"
-        versionNameSuffix "-cesta"
+        versionNameSuffix "-basket"
         // English only: drop upstream translations.
         resourceConfigurations.clear()
         resourceConfigurations += ["en"]
     }
     // Fork resources (name, icon, strings) layered over src/main without editing upstream files.
     sourceSets {
-        debug.res.srcDirs += "src/cesta/res"
-        release.res.srcDirs += "src/cesta/res"
+        debug.res.srcDirs += "src/basket/res"
+        release.res.srcDirs += "src/basket/res"
     }
     lint {
         // Issues already present upstream; CI fails only on new ones.
         baseline = file("lint-baseline.xml")
     }
     // Release signing: CI only (release.yml), using the keystore stored as a secret.
-    def cestaKeystore = System.getenv("CESTA_KEYSTORE")
-    if (cestaKeystore) {
+    def basketKeystore = System.getenv("BASKET_KEYSTORE")
+    if (basketKeystore) {
         signingConfigs {
-            cesta {
-                storeFile file(cestaKeystore)
-                storePassword System.getenv("CESTA_KEYSTORE_PASSWORD")
-                keyAlias "cesta"
-                keyPassword System.getenv("CESTA_KEYSTORE_PASSWORD")
+            basket {
+                storeFile file(basketKeystore)
+                storePassword System.getenv("BASKET_KEYSTORE_PASSWORD")
+                keyAlias "cesta" // alias inside the signing keystore, kept from the earlier name
+                keyPassword System.getenv("BASKET_KEYSTORE_PASSWORD")
                 storeType "pkcs12"
             }
         }
-        buildTypes.release.signingConfig signingConfigs.cesta
+        buildTypes.release.signingConfig signingConfigs.basket
     }
 }
 

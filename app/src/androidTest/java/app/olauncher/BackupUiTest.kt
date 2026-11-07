@@ -24,7 +24,7 @@ import java.io.File
 import java.util.regex.Pattern
 
 /**
- * Cesta: Settings → Backup driven through the real UI and the system file picker, as a user would.
+ * Basket: Settings → Backup driven through the real UI and the system file picker, as a user would.
  * Screenshots of every step (and of the failure) go to the app's external files dir, ui-test/,
  * which CI pulls and uploads as an artifact.
  */
@@ -124,8 +124,8 @@ class BackupUiTest {
             scrollToText("Import settings").click()
             waitFor(picker, "file picker (import)")
             shot("import-picker")
-            val file = device.wait(Until.findObject(By.textStartsWith("cesta-launcher-")), 5_000)
-                ?: run { goToDownloads(); waitFor(By.textStartsWith("cesta-launcher-"), "exported file in picker") }
+            val file = device.wait(Until.findObject(By.textStartsWith("basket-launcher-")), 5_000)
+                ?: run { goToDownloads(); waitFor(By.textStartsWith("basket-launcher-"), "exported file in picker") }
             file.click()
             waitFor(By.text("Import settings?"), "confirmation dialog")
             shot("import-confirm")

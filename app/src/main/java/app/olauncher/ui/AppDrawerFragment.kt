@@ -50,7 +50,7 @@ class AppDrawerFragment : BaseFragment() {
     private var currentPrivateSpaceApps: List<AppModel>? = null
     private var currentPrivateSpaceLocked: Boolean = true
     private var currentPrivateSpaceAvailable: Boolean = false
-    private var listPager: ListPager? = null // Cesta
+    private var listPager: ListPager? = null // Basket
 
     private val viewModel: MainViewModel by activityViewModels()
     private var _binding: FragmentAppDrawerBinding? = null
@@ -76,7 +76,7 @@ class AppDrawerFragment : BaseFragment() {
         initViews()
         initSearch()
         initAdapter()
-        if (flag == Constants.FLAG_LAUNCH_APP) listPager = ListPager( // Cesta: app list pages
+        if (flag == Constants.FLAG_LAUNCH_APP) listPager = ListPager( // Basket: app list pages
             binding, prefs, arguments?.getInt(ListPager.ARG_STEP, 0) ?: 0,
             itemAt = { adapter.appFilteredList.getOrNull(it) },
             onPageChanged = { updateCombinedAppList() },
