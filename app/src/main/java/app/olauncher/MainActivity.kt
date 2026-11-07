@@ -137,6 +137,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         isResumed = true
         viewModel.isPrivateSpaceToggling = false
+        AppListStore(this).removeUninstalled(this) // Cesta: uninstalls missed while stopped
         viewModel.getAppList()
     }
 

@@ -52,6 +52,10 @@ sleep 3
 adb uninstall io.github.jesusg703.cesta.debug.test
 sleep 5
 adb install -r "$TEST"
+# Instrumentation force-stops the app, so the broadcast may be missed; the launcher then cleans up
+# when it comes to the foreground (MainActivity.onResume), as it would on a phone.
+adb shell am start -W -n io.github.jesusg703.cesta.debug/app.olauncher.MainActivity >/dev/null
+sleep 2
 run_test verifyUninstalledListDeleted "$BACKUP"
 echo "Backup and list cleanup OK"
 

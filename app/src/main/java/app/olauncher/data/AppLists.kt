@@ -1,6 +1,8 @@
 package app.olauncher.data
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Process
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -136,6 +138,12 @@ object AppListCodec {
             else -> list.copy(apps = kept)
         }
     }
+
+    /** Removes every app of [user] whose package [isInstalled] rejects, with the same list rules as [removePackage]. */
+    fun removeUninstalled(lists: List<AppList>, user: String, isInstalled: (String) -> Boolean): List<AppList> {
+        val gone = lists.flatMap { it.apps }.filter { it.user == user }.map { it.appPackage }.toSet().filterNot(isInstalled)
+        return gone.fold(lists) { acc, pkg -> removePackage(acc, pkg, user) }
+    }
 }
 
 /** Saves lists with commit() (synchronous write), so they are on disk before the phone shuts down. */
@@ -156,9 +164,30 @@ class AppListStore(context: Context) {
     fun update(change: (List<AppList>) -> List<AppList>): Boolean =
         prefs.edit().putString(KEY, AppListCodec.encode(change(all()))).commit()
 
-    fun removePackage(appPackage: String, user: String) {
-        val before = all()
-        val after = AppListCodec.removePackage(before, appPackage, user)
+    fun removePackage(appPackage: String, user: String) = save(all()) { AppListCodec.removePackage(it, appPackage, user) }
+
+    /**
+     * Safety net for uninstalls the launcher missed (it was force-stopped, so no broadcast arrived).
+     * Only the launcher's own user: work profile apps disappear while the profile is paused.
+     * Disabled apps still count as installed.
+     */
+    fun removeUninstalled(context: Context) {
+        val pm = context.packageManager
+        val flags = PackageManager.MATCH_DISABLED_COMPONENTS or PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS
+        save(all()) { lists ->
+            AppListCodec.removeUninstalled(lists, Process.myUserHandle().toString()) { pkg ->
+                try {
+                    pm.getApplicationInfo(pkg, flags)
+                    true
+                } catch (e: PackageManager.NameNotFoundException) {
+                    false
+                }
+            }
+        }
+    }
+
+    private fun save(before: List<AppList>, change: (List<AppList>) -> List<AppList>) {
+        val after = change(before)
         if (after != before) prefs.edit().putString(KEY, AppListCodec.encode(after)).commit()
     }
 

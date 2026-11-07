@@ -124,4 +124,19 @@ class AppListCodecTest {
         // Same package in another profile is a different app.
         assertEquals(lists, AppListCodec.removePackage(lists, "com.google.android.gm", "UserHandle{0}"))
     }
+
+    @Test
+    fun removeUninstalledOnlyTouchesTheGivenUser() {
+        var lists = AppListCodec.create(emptyList(), "Gone", maps, id = "a")
+        lists = AppListCodec.create(lists, "Mixed", maps, id = "b")
+        lists = AppListCodec.toggle(lists, "b", ssh)
+        lists = AppListCodec.create(lists, "Work", workMail, id = "c")
+        lists = AppListCodec.create(lists, "Empty", id = "d")
+
+        // Nothing is installed: every app of user 0 goes, the work profile list stays.
+        val result = AppListCodec.removeUninstalled(lists, "UserHandle{0}") { it == "com.termux" }
+        assertEquals(listOf("b", "c", "d"), result.map { it.id })
+        assertEquals(listOf(ssh), result[0].apps)
+        assertEquals(lists, AppListCodec.removeUninstalled(lists, "UserHandle{0}") { true })
+    }
 }
