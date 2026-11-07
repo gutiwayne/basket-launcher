@@ -1,6 +1,8 @@
 package app.olauncher.data
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Process
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -114,13 +116,33 @@ object AppListCodec {
     fun contains(lists: List<AppList>, id: String, app: ListApp) =
         lists.firstOrNull { it.id == id }?.apps?.any { it.sameAppAs(app) } == true
 
-    /** Adds [app] to the list, or removes it if it is already there. */
-    fun toggle(lists: List<AppList>, id: String, app: ListApp) = lists.map { list ->
+    /**
+     * Adds [app] to the list, or removes it if it is already there.
+     * Removing the last app deletes the list; a list created empty stays until it gets its first app.
+     */
+    fun toggle(lists: List<AppList>, id: String, app: ListApp) = lists.mapNotNull { list ->
         when {
             list.id != id -> list
-            list.apps.any { it.sameAppAs(app) } -> list.copy(apps = list.apps.filterNot { it.sameAppAs(app) })
+            list.apps.any { it.sameAppAs(app) } ->
+                list.copy(apps = list.apps.filterNot { it.sameAppAs(app) }).takeIf { it.apps.isNotEmpty() }
             else -> list.copy(apps = list.apps + app)
         }
+    }
+
+    /** An uninstalled app (and its shortcuts) leaves every list; lists left without apps are deleted. */
+    fun removePackage(lists: List<AppList>, appPackage: String, user: String) = lists.mapNotNull { list ->
+        val kept = list.apps.filterNot { it.appPackage == appPackage && it.user == user }
+        when {
+            kept.size == list.apps.size -> list
+            kept.isEmpty() -> null
+            else -> list.copy(apps = kept)
+        }
+    }
+
+    /** Removes every app of [user] whose package [isInstalled] rejects, with the same list rules as [removePackage]. */
+    fun removeUninstalled(lists: List<AppList>, user: String, isInstalled: (String) -> Boolean): List<AppList> {
+        val gone = lists.flatMap { it.apps }.filter { it.user == user }.map { it.appPackage }.toSet().filterNot(isInstalled)
+        return gone.fold(lists) { acc, pkg -> removePackage(acc, pkg, user) }
     }
 }
 
@@ -141,6 +163,33 @@ class AppListStore(context: Context) {
 
     fun update(change: (List<AppList>) -> List<AppList>): Boolean =
         prefs.edit().putString(KEY, AppListCodec.encode(change(all()))).commit()
+
+    fun removePackage(appPackage: String, user: String) = save(all()) { AppListCodec.removePackage(it, appPackage, user) }
+
+    /**
+     * Safety net for uninstalls the launcher missed (it was force-stopped, so no broadcast arrived).
+     * Only the launcher's own user: work profile apps disappear while the profile is paused.
+     * Disabled apps still count as installed.
+     */
+    fun removeUninstalled(context: Context) {
+        val pm = context.packageManager
+        val flags = PackageManager.MATCH_DISABLED_COMPONENTS or PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS
+        save(all()) { lists ->
+            AppListCodec.removeUninstalled(lists, Process.myUserHandle().toString()) { pkg ->
+                try {
+                    pm.getApplicationInfo(pkg, flags)
+                    true
+                } catch (e: PackageManager.NameNotFoundException) {
+                    false
+                }
+            }
+        }
+    }
+
+    private fun save(before: List<AppList>, change: (List<AppList>) -> List<AppList>) {
+        val after = change(before)
+        if (after != before) prefs.edit().putString(KEY, AppListCodec.encode(after)).commit()
+    }
 
     private fun migrateLegacyFolders() {
         val legacy = prefs.getString(KEY_LEGACY_FOLDERS, null) ?: return

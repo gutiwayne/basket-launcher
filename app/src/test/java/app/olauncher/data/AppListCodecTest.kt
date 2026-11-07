@@ -82,4 +82,61 @@ class AppListCodecTest {
     fun damagedJsonThrowsInsteadOfSilentlyLosingLists() {
         AppListCodec.decode("{\"v\":2,\"lists\":[{\"id\":")
     }
+
+    @Test
+    fun removingTheLastAppDeletesTheList() {
+        var lists = AppListCodec.create(emptyList(), "A", maps, id = "a")
+        lists = AppListCodec.create(lists, "B", ssh, id = "b")
+        lists = AppListCodec.toggle(lists, "a", maps)
+        assertEquals(listOf("b"), lists.map { it.id })
+    }
+
+    @Test
+    fun removingAnAppThatIsNotTheLastKeepsTheList() {
+        var lists = AppListCodec.create(emptyList(), "A", maps, id = "a")
+        lists = AppListCodec.toggle(lists, "a", ssh)
+        lists = AppListCodec.toggle(lists, "a", maps)
+        assertEquals(listOf(ssh), lists.single().apps)
+    }
+
+    @Test
+    fun listCreatedEmptyStaysUntilItsFirstApp() {
+        var lists = AppListCodec.create(emptyList(), "Empty", id = "e")
+        lists = AppListCodec.create(lists, "Other", maps, id = "o")
+        lists = AppListCodec.toggle(lists, "o", ssh)
+        assertEquals(listOf("e", "o"), lists.map { it.id })
+        assertTrue(lists[0].apps.isEmpty())
+    }
+
+    @Test
+    fun uninstallRemovesTheAppAndItsShortcutsEverywhere() {
+        var lists = AppListCodec.create(emptyList(), "Only maps", maps, id = "a")
+        lists = AppListCodec.toggle(lists, "a", shortcut)
+        lists = AppListCodec.create(lists, "Mixed", maps, id = "b")
+        lists = AppListCodec.toggle(lists, "b", ssh)
+        lists = AppListCodec.create(lists, "Empty", id = "c")
+        lists = AppListCodec.create(lists, "Work", workMail, id = "d")
+
+        lists = AppListCodec.removePackage(lists, "com.google.android.apps.maps", "UserHandle{0}")
+        assertEquals(listOf("b", "c", "d"), lists.map { it.id })
+        assertEquals(listOf(ssh), lists[0].apps)
+
+        // Same package in another profile is a different app.
+        assertEquals(lists, AppListCodec.removePackage(lists, "com.google.android.gm", "UserHandle{0}"))
+    }
+
+    @Test
+    fun removeUninstalledOnlyTouchesTheGivenUser() {
+        var lists = AppListCodec.create(emptyList(), "Gone", maps, id = "a")
+        lists = AppListCodec.create(lists, "Mixed", maps, id = "b")
+        lists = AppListCodec.toggle(lists, "b", ssh)
+        lists = AppListCodec.create(lists, "Work", workMail, id = "c")
+        lists = AppListCodec.create(lists, "Empty", id = "d")
+
+        // Nothing is installed: every app of user 0 goes, the work profile list stays.
+        val result = AppListCodec.removeUninstalled(lists, "UserHandle{0}") { it == "com.termux" }
+        assertEquals(listOf("b", "c", "d"), result.map { it.id })
+        assertEquals(listOf(ssh), result[0].apps)
+        assertEquals(lists, AppListCodec.removeUninstalled(lists, "UserHandle{0}") { true })
+    }
 }

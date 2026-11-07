@@ -1,51 +1,57 @@
 name: Sync with Olauncher
 
-# Every Monday: master = exact mirror of upstream; merged into carpetas, tested and pushed.
-# On conflict or test failure nothing is pushed and an issue is opened (GitHub notifies you).
+# Every Monday: master = exact mirror of upstream; the merge into carpetas is tested and offered as a
+# pull request (branch sync/upstream), never pushed to carpetas directly, so upstream code is reviewed first.
+# On conflict or test failure nothing is pushed to carpetas and an issue is opened (GitHub notifies you).
+#
+# Upstream code is only built in the "test" job, which has a read-only token that is not stored on disk.
+# The jobs that can write never run a build.
 on:
   schedule:
     - cron: "17 6 * * 1"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  issues: write
+permissions: {}
 
 concurrency:
   group: sync-upstream
 
 jobs:
-  sync:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      new: ${{ steps.fetch.outputs.new }}
+      sha: ${{ steps.fetch.outputs.sha }}
+      merged: ${{ steps.merge.outputs.ok }}
+      conflicts: ${{ steps.merge.outputs.conflicts }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: carpetas
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Fetch upstream
         id: fetch
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add upstream https://github.com/tanujnotes/Olauncher.git
           git fetch --no-tags upstream master
-          git fetch --no-tags origin master
-          echo "new=$(git rev-list --count origin/master..upstream/master)" >> "$GITHUB_OUTPUT"
-
-      - name: Update master (fast-forward only)
-        if: steps.fetch.outputs.new != '0'
-        run: git push origin upstream/master:refs/heads/master
+          echo "sha=$(git rev-parse upstream/master)" >> "$GITHUB_OUTPUT"
+          echo "new=$(git rev-list --count HEAD..upstream/master)" >> "$GITHUB_OUTPUT"
 
       - name: Merge into carpetas
         id: merge
         if: steps.fetch.outputs.new != '0'
         run: |
-          if git merge --no-edit upstream/master -m "Merge Olauncher upstream ($(git rev-parse --short upstream/master))"; then
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git merge --no-edit "${{ steps.fetch.outputs.sha }}" -m "Merge Olauncher upstream"; then
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
-            git diff --name-only --diff-filter=U > conflicts.txt
+            echo "conflicts=$(git diff --name-only --diff-filter=U | paste -sd ' ' -)" >> "$GITHUB_OUTPUT"
             git merge --abort
             echo "ok=false" >> "$GITHUB_OUTPUT"
           fi
@@ -60,27 +66,79 @@ jobs:
         if: steps.merge.outputs.ok == 'true'
 
       - name: Test the merge
-        id: test
         if: steps.merge.outputs.ok == 'true'
         run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
 
-      - name: Push carpetas
-        if: steps.merge.outputs.ok == 'true' && steps.test.outcome == 'success'
-        run: git push origin HEAD:carpetas
+  publish:
+    needs: test
+    if: always() && needs.test.outputs.new != '' && needs.test.outputs.new != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: carpetas
+          fetch-depth: 0
 
-      - name: Report when manual action is needed
-        if: failure() || steps.merge.outputs.ok == 'false'
+      - name: Update master (fast-forward only)
+        run: |
+          git remote add upstream https://github.com/tanujnotes/Olauncher.git
+          git fetch --no-tags upstream master
+          git push origin "${{ needs.test.outputs.sha }}:refs/heads/master"
+
+      - name: Open a pull request into carpetas
+        if: needs.test.result == 'success' && needs.test.outputs.merged == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          SHA: ${{ needs.test.outputs.sha }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Same commits as the tested merge; only the merge commit's timestamp differs.
+          git merge --no-edit "$SHA" -m "Merge Olauncher upstream (${SHA:0:7})"
+          git push --force origin HEAD:refs/heads/sync/upstream
+          compare="${{ github.server_url }}/${{ github.repository }}/compare/carpetas...sync/upstream"
+          if [ -n "$(gh pr list --head sync/upstream --base carpetas --state open --json number --jq '.[].number')" ]; then
+            echo "Pull request already open; branch updated."
+            exit 0
+          fi
+          printf '%s\n\n%s\n' \
+            "Weekly merge of Olauncher upstream (${SHA:0:7}). Unit tests, lint and the debug build passed." \
+            "Review the upstream changes before merging: $compare" > body.md
+          if ! gh pr create --base carpetas --head sync/upstream --title "Olauncher sync ($(date +%F))" --body-file body.md; then
+            echo "::warning::Could not open a pull request (Settings → Actions → General → allow GitHub Actions to create pull requests). Review: $compare"
+          fi
+
+  report:
+    needs: [test, publish]
+    if: always() && (needs.test.result == 'failure' || needs.test.outputs.merged == 'false' || needs.publish.result == 'failure')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Report when manual action is needed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CONFLICTS: ${{ needs.test.outputs.conflicts }}
         run: |
           {
             echo "The weekly sync with Olauncher needs attention."
             echo
             echo "- Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            if [ -s conflicts.txt ]; then echo "- Conflicts in:"; sed 's/^/  - `/; s/$/`/' conflicts.txt; else echo "- Reason: build or tests fail after merging."; fi
+            if [ -n "$CONFLICTS" ]; then
+              echo "- Conflicts in:"; for f in $CONFLICTS; do echo "  - \`$f\`"; done
+            elif [ "${{ needs.test.result }}" = "failure" ]; then
+              echo "- Reason: build or tests fail after merging."
+            else
+              echo "- Reason: pushing \`master\` or \`sync/upstream\` failed."
+            fi
             echo
-            echo "Nothing was pushed to \`carpetas\`. \`master\` is already up to date with upstream."
+            echo "Nothing was pushed to \`carpetas\`."
           } > issue.md
-          gh issue create --title "Olauncher sync: needs review ($(date +%F))" --body-file issue.md \
+          gh issue create --repo "${{ github.repository }}" --title "Olauncher sync: needs review ($(date +%F))" --body-file issue.md \
             || echo "::warning::Could not open an issue (Issues disabled on the fork?). GitHub still emails you about the failed run."
           exit 1

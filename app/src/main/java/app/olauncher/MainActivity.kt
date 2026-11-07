@@ -21,10 +21,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import app.olauncher.data.AppListStore
 import app.olauncher.data.Constants
 import app.olauncher.data.Fork
 import app.olauncher.data.Prefs
 import app.olauncher.databinding.ActivityMainBinding
+import app.olauncher.ui.BackupSection
 import app.olauncher.helper.getColorFromAttr
 import app.olauncher.helper.hasBeenDays
 import app.olauncher.helper.hasBeenHours
@@ -135,13 +137,15 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         isResumed = true
         viewModel.isPrivateSpaceToggling = false
+        AppListStore(this).removeUninstalled(this) // Cesta: uninstalls missed while stopped
         viewModel.getAppList()
     }
 
     private fun registerShortcutCallback() {
         val launcherApps = getSystemService(LauncherApps::class.java)
         launcherAppsCallback = object : LauncherApps.Callback() {
-            override fun onPackageRemoved(packageName: String, user: android.os.UserHandle) = Unit
+            override fun onPackageRemoved(packageName: String, user: android.os.UserHandle) =
+                AppListStore(this@MainActivity).removePackage(packageName, user.toString()) // Cesta
             override fun onPackageAdded(packageName: String, user: android.os.UserHandle) = Unit
             override fun onPackageChanged(packageName: String, user: android.os.UserHandle) = Unit
             override fun onPackagesAvailable(
@@ -347,6 +351,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun backToHomeScreen() {
         if (viewModel.isPrivateSpaceToggling) return
+        if (BackupSection.pickerOpen) return // Cesta: keep Settings alive while the file picker is open
         messageDialog?.dismiss()
         if (navController.currentDestination?.id != R.id.mainFragment)
             navController.popBackStack(R.id.mainFragment, false)

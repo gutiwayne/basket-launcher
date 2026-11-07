@@ -36,7 +36,8 @@ import kotlin.math.abs
  * - Swipe left/right anywhere in the drawer to change page (wraps around).
  * - The page name sits above the search box, with ‹ › arrows on its right and dots for the position;
  *   long press the name to manage lists.
- * - Long press an app → "Lists" to add it to or remove it from any list.
+ * - Long press an app → "Lists" to add it to or remove it from any list. Removing a list's last app
+ *   (or uninstalling it) deletes the list; a list created empty stays until it gets its first app.
  * Search works the same on every page, limited to that page's apps.
  */
 class ListPager(
@@ -256,8 +257,10 @@ class ListPager(
             context.getString(R.string.cesta_new_list)
         showChoiceDialog(app.label, labels) { index ->
             if (index < current.size) {
-                store.update { AppListCodec.toggle(it, current[index].id, app) }
+                val list = current[index]
+                store.update { AppListCodec.toggle(it, list.id, app) }
                 reload()
+                if (lists.none { it.id == list.id }) context.showToast(context.getString(R.string.cesta_list_deleted, list.name))
                 showListsFor(app)
             } else askName(context.getString(R.string.cesta_list_default_name)) { name ->
                 store.update { AppListCodec.create(it, name, app) }

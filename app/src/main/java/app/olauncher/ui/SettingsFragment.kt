@@ -59,6 +59,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
     private val binding get() = _binding!!
     private val showPentastic = System.currentTimeMillis() % 2 == 0L
     private var dialog: OlDialog? = null
+    private val backupSection = BackupSection(this) // Cesta
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
@@ -99,6 +100,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         if (showPentastic)
             binding.footer.text = getText(R.string.new_app_minimal_todo_lists)
         binding.hideUpstreamPromos() // Cesta
+        backupSection.attach(binding) // Cesta
     }
 
     override fun onClick(view: View) {
