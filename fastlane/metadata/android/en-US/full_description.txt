@@ -1,4 +1,4 @@
-<p><b>Basket Launcher</b> is a minimal, text-only Android launcher with <b>app lists</b>: group your apps into lists and swipe between them. It is a fork of <a href="https://github.com/tanujnotes/Olauncher">Olauncher</a> by tanujnotes and keeps all of its features.</p>
+<p><b>Basket Launcher</b> is a minimal, text-only Android launcher with <b>app lists</b>: group your apps into lists and swipe between them.</p>
 <p><b>App lists</b></p>
 <ul>
 <li>Each list is a page of the app drawer, next to "All apps". Swipe sideways or use the ‹ › arrows to move between them.</li>
@@ -7,7 +7,7 @@
 <li>A list is deleted automatically when its last app is uninstalled.</li>
 <li><b>Backup</b>: export and import your lists and settings as a JSON file (Settings → Backup).</li>
 </ul>
-<p><b>From Olauncher</b></p>
+<p><b>Also</b></p>
 <ul>
 <li>Minimalist home screen with no icons, ads or distractions.</li>
 <li>Rename, hide and resize apps, text alignment, status bar on or off, dark and light themes.</li>
@@ -15,5 +15,6 @@
 <li>Optional daily wallpaper.</li>
 <li>Screen time indicator, work profile and Private Space support.</li>
 </ul>
+<p>Based on <a href="https://github.com/tanujnotes/Olauncher">Olauncher</a> by tanujnotes.</p>
 <p><b>Privacy</b>: no data collection, no account, no ads. Free software under the GPL-3.0.</p>
 <p><b>Accessibility Service</b>: used only to turn off the screen with a double tap. It is optional, disabled by default and does not collect or share any data.</p>
