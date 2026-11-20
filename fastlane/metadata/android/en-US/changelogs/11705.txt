@@ -1,0 +1,2 @@
+• New versionCode scheme so app stores detect every Basket Launcher release as an update.
+• Store listing: new description, icon and screenshots.
