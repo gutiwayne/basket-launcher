@@ -1,3 +1,17 @@
+# Basket Launcher
+
+A minimal, text-only Android launcher with **app lists**: group your apps into lists and swipe between them.
+Long press an app → **Lists** to add it to one or more lists; long press a list name to rename, move or delete it.
+Settings → **Backup** exports and imports your lists and settings as a JSON file.
+
+[<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="54">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/gutiwayne/basket-launcher)
+
+**Install:** download the APK from the [latest release](https://github.com/gutiwayne/basket-launcher/releases/latest), or add this repo to [Obtainium](https://obtainium.imranr.dev) to get updates automatically.
+
+Basket Launcher is a fork of [Olauncher](https://github.com/tanujnotes/Olauncher) by tanujnotes (GPL-3.0). The upstream README follows.
+
+---
+
 ![Olauncher](https://repository-images.githubusercontent.com/278638069/db0acb80-661b-11eb-803e-926cae5dccb4)
 
 
