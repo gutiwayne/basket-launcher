@@ -80,6 +80,10 @@ android {
     defaultConfig {
         applicationId "io.github.gutiwayne.basket"
         versionNameSuffix "-basket"
+        // Fork revision, the N of the release tag v<upstream>-basket.N: bump it for every Basket release
+        // so app stores (IzzyOnDroid, F-Droid) see a higher versionCode than the upstream one it extends.
+        def basketRevision = 5
+        versionCode = versionCode * 100 + basketRevision
         // English only: drop upstream translations.
         resourceConfigurations.clear()
         resourceConfigurations += ["en"]

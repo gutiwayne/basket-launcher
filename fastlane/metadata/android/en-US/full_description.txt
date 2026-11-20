@@ -1,1 +1,19 @@
-<p><b>Are you using your phone, or is your phone using you?</b></b><p><i>Olauncher</i> is a minimal AF Android launcher with just enough features. By the way, AF stands for AdFree. :D</p><p><br><b>FEATURES YOU MIGHT LIKE:</b></p><ul><li><b>Minimalist homescreen:</b> A clean homescreen experience with no icons, ads or any distraction. It helps you reduce your screen time and increase productivity.</li><li><b>Customizations:</b> Resize text, rename apps, hide unused apps, show or hide the status bar, app text alignments, etc.</li><li><b>Gestures:</b> Double tap to lock screen. Swipe left or right to open apps. Swipe down for notifications.</li><li><b>Wallpaper:</b> A beautiful new wallpaper, daily. No one said that a minimalist launcher has to be boring. :)</li><li><b>Privacy:</b> No data collection. FOSS Android launcher. Open source under GPLv3 license.</li><li><b>Launcher features:</b> Dark &amp; light themes, dual apps support, work profile support, auto app launch.</li></ul><p>To maintain the simplicity of such a minimalist launcher, a few niche features are available but hidden. Please visit the <b>About</b> page in settings for the complete list.</p><p><b>FAQs:</b></p><ul><li><b>1. Hidden apps</b> - Long press anywhere on the home screen to open settings. Tap ’Olauncher’ on the top to see your hidden apps.</li><li><b>2. Navigation gestures</b> - Some devices do not support gestures with a downloaded Android launchers. This can only be fixed by your device manufacturer via an update.</li><li><b>3. Wallpapers</b> - This Android launcher provides a new wallpaper daily. You can also set any wallpaper you want from your phone settings or Gallery/Photos app.</li></ul><p>Our About page in settings has rest of the FAQs and several other tips to help you make the best usage of Olauncher. Please check it out.</p><p><b>Accessibility Service:</b> Our Accessibility Service is used exclusively to let you turn off your phone’s screen with a double-tap gesture. It is optional, disabled by default and doesn’t collect or share any data.</p><p>P.S. Thank you for checking out the description till the end. Only a few very special people do that. Take care! ❤️</p>
+<p><b>Basket Launcher</b> is a minimal, text-only Android launcher with <b>app lists</b>: group your apps into lists and swipe between them. It is a fork of <a href="https://github.com/tanujnotes/Olauncher">Olauncher</a> by tanujnotes and keeps all of its features.</p>
+<p><b>App lists</b></p>
+<ul>
+<li>Each list is a page of the app drawer, next to "All apps". Swipe sideways or use the ‹ › arrows to move between them.</li>
+<li>Long press an app → <b>Lists</b> to add it to one or more lists; long press a list name to rename it, move it left or right, or delete it.</li>
+<li>If no app is set for the home screen side swipes, swiping sideways opens the next or previous list.</li>
+<li>A list is deleted automatically when its last app is uninstalled.</li>
+<li><b>Backup</b>: export and import your lists and settings as a JSON file (Settings → Backup).</li>
+</ul>
+<p><b>From Olauncher</b></p>
+<ul>
+<li>Minimalist home screen with no icons, ads or distractions.</li>
+<li>Rename, hide and resize apps, text alignment, status bar on or off, dark and light themes.</li>
+<li>Gestures: double tap to lock the screen, swipe left or right to open apps, swipe down for notifications.</li>
+<li>Optional daily wallpaper.</li>
+<li>Screen time indicator, work profile and Private Space support.</li>
+</ul>
+<p><b>Privacy</b>: no data collection, no account, no ads. Free software under the GPL-3.0.</p>
+<p><b>Accessibility Service</b>: used only to turn off the screen with a double tap. It is optional, disabled by default and does not collect or share any data.</p>
