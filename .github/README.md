@@ -9,8 +9,6 @@ the original author; this fork only adds a few things on top and follows upstrea
 [<img src="https://raw.githubusercontent.com/Kunzisoft/Github-badge/main/get-it-on-github.png" alt="Get it on GitHub" height="54">](https://github.com/gutiwayne/basket-launcher/releases/latest)
 [<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="54">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/gutiwayne/basket-launcher)
 
-It was called *Cesta Launcher* before.
-
 <p>
   <img src="../fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpg" width="150" alt="Screenshot 1">
   <img src="../fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg" width="150" alt="Screenshot 2">
