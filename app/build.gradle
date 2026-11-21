@@ -84,7 +84,12 @@ android {
         // versionName matches the tag (F-Droid derives the release APK URL from it).
         def basketRevision = 6
         versionNameSuffix "-basket.${basketRevision}"
-        versionCode = versionCode * 100 + basketRevision
+        // Written out because F-Droid's update checker reads it from this file (UpdateCheckData).
+        def basketVersionCode = 11706
+        if (basketVersionCode != versionCode * 100 + basketRevision) {
+            throw new GradleException("basketVersionCode must be ${versionCode * 100 + basketRevision}")
+        }
+        versionCode = basketVersionCode
         // English only: drop upstream translations.
         resourceConfigurations.clear()
         resourceConfigurations += ["en"]
