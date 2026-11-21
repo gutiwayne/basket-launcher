@@ -1,0 +1,2 @@
+• The app name in the source is Basket Launcher too (F-Droid reads it from there).
+• README: Get it on GitHub and Obtainium badges.
