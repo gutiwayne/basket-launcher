@@ -11,6 +11,16 @@ the original author; this fork only adds a few things on top and follows upstrea
 
 It was called *Cesta Launcher* before.
 
+<p>
+  <img src="../fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpg" width="150" alt="Screenshot 1">
+  <img src="../fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg" width="150" alt="Screenshot 2">
+  <img src="../fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg" width="150" alt="Screenshot 3">
+  <img src="../fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg" width="150" alt="Screenshot 4">
+  <img src="../fastlane/metadata/android/en-US/images/phoneScreenshots/5.jpg" width="150" alt="Screenshot 5">
+  <img src="../fastlane/metadata/android/en-US/images/phoneScreenshots/6.jpg" width="150" alt="Screenshot 6">
+  <img src="../fastlane/metadata/android/en-US/images/phoneScreenshots/7.jpg" width="150" alt="Screenshot 7">
+</p>
+
 ## What is different from Olauncher
 
 - **App lists.** Swipe up for *All apps* as usual, then swipe left or right to move between your
