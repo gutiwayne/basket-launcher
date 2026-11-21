@@ -4,6 +4,7 @@ A minimal, text-only Android launcher with **app lists**: group your apps into l
 Long press an app → **Lists** to add it to one or more lists; long press a list name to rename, move or delete it.
 Settings → **Backup** exports and imports your lists and settings as a JSON file.
 
+[<img src="https://raw.githubusercontent.com/Kunzisoft/Github-badge/main/get-it-on-github.png" alt="Get it on GitHub" height="54">](https://github.com/gutiwayne/basket-launcher/releases/latest)
 [<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="54">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/gutiwayne/basket-launcher)
 
 **Install:** download the APK from the [latest release](https://github.com/gutiwayne/basket-launcher/releases/latest), or add this repo to [Obtainium](https://obtainium.imranr.dev) to get updates automatically.
