@@ -6,6 +6,9 @@ Basket Launcher is a fork of [Olauncher](https://github.com/tanujnotes/Olauncher
 [tanujnotes](https://github.com/tanujnotes). All the credit for the launcher itself goes to
 the original author; this fork only adds a few things on top and follows upstream weekly.
 
+[<img src="https://raw.githubusercontent.com/Kunzisoft/Github-badge/main/get-it-on-github.png" alt="Get it on GitHub" height="54">](https://github.com/gutiwayne/basket-launcher/releases/latest)
+[<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="54">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/gutiwayne/basket-launcher)
+
 It was called *Cesta Launcher* before.
 
 ## What is different from Olauncher
@@ -26,7 +29,8 @@ Everything else (gestures, hidden apps, screen time, daily wallpapers…) is Ola
 ## Install
 
 Download the APK from [Releases](https://github.com/gutiwayne/basket-launcher/releases) and open it on
-your phone. Check the file against the `.sha256` next to it.
+your phone, or add this repo to [Obtainium](https://obtainium.imranr.dev) to get updates automatically.
+Check the file against the `.sha256` next to it.
 
 Releases are signed with this certificate (SHA-256):
 

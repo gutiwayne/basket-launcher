@@ -82,10 +82,10 @@ android {
         // Fork revision, the N of the release tag v<upstream>-basket.N: bump it for every Basket release
         // so app stores (IzzyOnDroid, F-Droid) see a higher versionCode than the upstream one it extends.
         // versionName matches the tag (F-Droid derives the release APK URL from it).
-        def basketRevision = 6
+        def basketRevision = 7
         versionNameSuffix "-basket.${basketRevision}"
         // Written out because F-Droid's update checker reads it from this file (UpdateCheckData).
-        def basketVersionCode = 11706
+        def basketVersionCode = 11707
         if (basketVersionCode != versionCode * 100 + basketRevision) {
             throw new GradleException("basketVersionCode must be ${versionCode * 100 + basketRevision}")
         }
