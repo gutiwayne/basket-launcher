@@ -48,6 +48,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config merge.ours.driver true  # fastlane/** keeps the fork's version (.gitattributes)
           if git merge --no-edit "${{ steps.fetch.outputs.sha }}" -m "Merge Olauncher upstream"; then
             echo "ok=true" >> "$GITHUB_OUTPUT"
           else
@@ -98,6 +99,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # Same commits as the tested merge; only the merge commit's timestamp differs.
+          git config merge.ours.driver true  # fastlane/** keeps the fork's version (.gitattributes)
           git merge --no-edit "$SHA" -m "Merge Olauncher upstream (${SHA:0:7})"
           git push --force origin HEAD:refs/heads/sync/upstream
           compare="${{ github.server_url }}/${{ github.repository }}/compare/basket...sync/upstream"
