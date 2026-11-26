@@ -1,0 +1,3 @@
+# The fork keeps its own store metadata: on upstream merges our side wins.
+# The "ours" driver is defined in .github/workflows/sync-upstream.yml (git config merge.ours.driver true).
+fastlane/** merge=ours
